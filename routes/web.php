@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController; // Ensure this line is present
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,8 +15,11 @@ use App\Http\Controllers\AuthController; // Ensure this line is present
 |
 */
 
-// Default route redirect
+// Default route: go to home if logged in, otherwise login
 Route::get('/', function () {
+    if (session()->has('user_id')) {
+        return redirect('/home');
+    }
     return redirect('/login');
 });
 
@@ -48,6 +52,14 @@ Route::post('/register/complete', [AuthController::class, 'completeRegistration'
 
 // Mock Dashboard Route for successful registration redirect
 Route::get('/dashboard', function () {
-    // In a real app, this view would be in resources/views/dashboard.blade.php
-    return "<h1>Dashboard</h1><p>You have successfully logged in or registered!</p><p>Message: Registration Complete! Welcome to PocketRader.</p>";
+    return redirect('/home');
+});
+
+// Placeholder logout (GET) to quickly clear session and go to login
+Route::get('/logout', [HomeController::class, 'logout'])->name('logout.get');
+
+// HOME Routes with auth middleware
+Route::middleware(['auth'])->group(function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
 });

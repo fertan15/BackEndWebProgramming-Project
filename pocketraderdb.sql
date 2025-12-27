@@ -273,6 +273,110 @@ CREATE TABLE `wishlists` (
 
 /*Data for the table `wishlists` */
 
+-- ------------------------------------------------------
+-- Dummy data inserts (FK-safe order)
+-- ------------------------------------------------------
+START TRANSACTION;
+
+-- card_sets
+INSERT INTO card_sets (id, name, release_date, description, image_url, total_cards) VALUES
+  (1, 'Base Set', '2020-01-01', 'Original base set', 'https://img.example.com/sets/base.jpg', 102),
+  (2, 'Jungle', '2020-06-01', 'Jungle expansion', 'https://img.example.com/sets/jungle.jpg', 64);
+
+-- users
+INSERT INTO users (
+  id, name, username, password_hash, email, phone_number, balance,
+  identity_type, identity_number, identity_image_url, identity_status,
+  otp_code, otp_expires_at, account_status, ban_reason, banned_at, is_admin,
+  last_online, created_at
+) VALUES
+  (1, 'Benny Example', 'benny', '$2y$10$examplehash1', 'benny@example.com', '+62111111111', 100.00,
+   'KTP', 'KTP-001', 'https://img.example.com/id/ktp-001.jpg', 'verified',
+   NULL, NULL, 'active', NULL, NULL, 1,
+   '2025-12-01 10:00:00', '2025-11-01 09:00:00'),
+  (2, 'Alice Seller', 'alice', '$2y$10$examplehash2', 'alice@example.com', '+62122222222', 50.00,
+   'SIM', 'SIM-002', 'https://img.example.com/id/sim-002.jpg', 'verified',
+   NULL, NULL, 'active', NULL, NULL, 0,
+   '2025-12-02 11:00:00', '2025-11-02 09:00:00'),
+  (3, 'Bob Seller', 'bob', '$2y$10$examplehash3', 'bob@example.com', '+62133333333', 75.00,
+   'Passport', 'PASS-003', 'https://img.example.com/id/pass-003.jpg', 'pending',
+   NULL, NULL, 'active', NULL, NULL, 0,
+   '2025-12-03 12:00:00', '2025-11-03 09:00:00'),
+  (4, 'Carla Buyer', 'carla', '$2y$10$examplehash4', 'carla@example.com', '+62144444444', 200.00,
+   NULL, NULL, NULL, 'unverified',
+   NULL, NULL, 'active', NULL, NULL, 0,
+   '2025-12-04 13:00:00', '2025-11-04 09:00:00'),
+  (5, 'Derek Buyer', 'derek', '$2y$10$examplehash5', 'derek@example.com', '+62155555555', 150.00,
+   NULL, NULL, NULL, 'unverified',
+   NULL, NULL, 'active', NULL, NULL, 0,
+   '2025-12-05 14:00:00', '2025-11-05 09:00:00');
+
+-- cards
+INSERT INTO cards (id, card_set_id, name, card_type, image_url, rarity, edition, estimated_market_price) VALUES
+  (1, 1, 'Charizard', 'Monster', 'https://img.example.com/cards/charizard.jpg', 'Rare', 'First', 300.00),
+  (2, 1, 'Blastoise', 'Monster', 'https://img.example.com/cards/blastoise.jpg', 'Rare', 'Unlimited', 200.00),
+  (3, 1, 'Venusaur', 'Monster', 'https://img.example.com/cards/venusaur.jpg', 'Rare', 'Unlimited', 180.00),
+  (4, 2, 'Pikachu', 'Monster', 'https://img.example.com/cards/pikachu.jpg', 'Common', 'Unlimited', 25.00),
+  (5, 2, 'Eevee', 'Monster', 'https://img.example.com/cards/eevee.jpg', 'Uncommon', 'Unlimited', 40.00);
+
+-- listings
+INSERT INTO listings (id, card_id, seller_id, price, condition_text, description, quantity, is_active, created_at) VALUES
+  (1, 4, 2, 30.00, 'Near Mint', 'Pikachu NM', 2, 1, '2025-12-10 09:00:00'),
+  (2, 5, 2, 45.00, 'Lightly Played', 'Eevee LP', 1, 1, '2025-12-10 10:00:00'),
+  (3, 2, 3, 210.00, 'Mint', 'Blastoise Mint', 1, 1, '2025-12-11 11:00:00'),
+  (4, 3, 3, 175.00, 'Heavily Played', 'Venusaur HP', 1, 0, '2025-12-11 12:00:00');
+
+-- chats
+INSERT INTO chats (id, user1_id, user2_id, created_at) VALUES
+  (1, 1, 2, '2025-12-12 09:00:00'),
+  (2, 2, 3, '2025-12-12 09:30:00');
+
+-- messages
+INSERT INTO messages (id, chat_id, sender_id, content, sent_at) VALUES
+  (1, 1, 1, 'Hi Alice, interested in Pikachu.', '2025-12-12 09:05:00'),
+  (2, 1, 2, 'Sure, I have two near mint.', '2025-12-12 09:06:00'),
+  (3, 2, 2, 'Bob, can you check my listing?', '2025-12-12 09:35:00'),
+  (4, 2, 3, 'Looks good. Price is fair.', '2025-12-12 09:36:00');
+
+-- orders
+INSERT INTO orders (id, buyer_id, order_date, order_status, shipping_address, tracking_number, payment_status, paid_at, subtotal, shipping_cost, platform_fee, tax_amount, total_amount) VALUES
+  (1, 4, '2025-12-13 10:00:00', 'Processing', 'Jl. Contoh No.1, Jakarta', 'TRK-1001', 'Paid', '2025-12-13 10:05:00', 30.00, 5.00, 1.50, 3.00, 39.50),
+  (2, 5, '2025-12-14 11:00:00', 'Shipped', 'Jl. Contoh No.2, Bandung', 'TRK-1002', 'Paid', '2025-12-14 11:10:00', 45.00, 6.00, 2.25, 4.50, 57.75),
+  (3, 4, '2025-12-15 12:00:00', 'Cancelled', 'Jl. Contoh No.1, Jakarta', NULL, 'Refunded', '2025-12-15 12:10:00', 210.00, 0.00, 10.50, 0.00, 220.50);
+
+-- order_items
+INSERT INTO order_items (id, order_id, listing_id, quantity, price_at_purchase) VALUES
+  (1, 1, 1, 1, 30.00),
+  (2, 2, 2, 1, 45.00),
+  (3, 3, 3, 1, 210.00);
+
+-- reviews
+INSERT INTO reviews (id, reviewer_id, reviewee_id, order_id, rating, comment, created_at) VALUES
+  (1, 4, 2, 1, 5, 'Great seller, fast shipping!', '2025-12-16 09:00:00'),
+  (2, 5, 2, 2, 4, 'Item as described.', '2025-12-17 10:00:00');
+
+-- user_collections
+INSERT INTO user_collections (id, user_id, card_id, condition_text, is_for_trade, added_at) VALUES
+  (1, 1, 1, 'Lightly Played', 0, '2025-12-10 08:00:00'),
+  (2, 2, 2, 'Mint', 1, '2025-12-10 08:30:00'),
+  (3, 3, 5, 'Near Mint', 0, '2025-12-10 09:00:00');
+
+-- wallet_transactions
+INSERT INTO wallet_transactions (id, user_id, reference_order_id, amount, transaction_type, description, created_at) VALUES
+  (1, 4, NULL, 100.00, 'TOPUP', 'Initial topup', '2025-12-12 08:00:00'),
+  (2, 4, 1, -39.50, 'PURCHASE', 'Order #1 payment', '2025-12-13 10:05:00'),
+  (3, 2, 1, 30.00, 'SALES_REVENUE', 'Order #1 revenue', '2025-12-13 10:06:00'),
+  (4, 5, 2, -57.75, 'PURCHASE', 'Order #2 payment', '2025-12-14 11:10:00'),
+  (5, 2, 2, 45.00, 'SALES_REVENUE', 'Order #2 revenue', '2025-12-14 11:11:00'),
+  (6, 4, 3, 220.50, 'REFUND', 'Order #3 refund', '2025-12-15 12:15:00');
+
+-- wishlists (unique user_id + card_id)
+INSERT INTO wishlists (id, user_id, card_id, added_at) VALUES
+  (1, 3, 5, '2025-12-12 07:00:00'),
+  (2, 5, 1, '2025-12-12 07:30:00');
+
+COMMIT;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

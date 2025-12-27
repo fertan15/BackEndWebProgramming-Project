@@ -24,9 +24,15 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // For now, we bypass actual authentication and redirect to the dashboard.
-        // Later, this is where your database checks would happen.
-        return redirect('/dashboard');
+        // Placeholder auth: store minimal session and redirect to home
+        // In a real app, validate credentials and fetch user from DB.
+        $email = $request->input('email');
+        $name = $request->input('name') ?? ($email ? explode('@', $email)[0] : 'User');
+
+        $request->session()->put('user_id', 1);
+        $request->session()->put('user_name', $name);
+
+        return redirect('/home');
     }
 
     /**
