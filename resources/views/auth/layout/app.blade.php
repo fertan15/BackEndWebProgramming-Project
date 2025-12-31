@@ -15,6 +15,8 @@
             background-color: #f5f7fb;
         }
     </style>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="min-h-screen flex items-center justify-center px-4 py-8">
     <main class="w-full max-w-6xl bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-100">

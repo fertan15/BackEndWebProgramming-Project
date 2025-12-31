@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Otp;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,3 +64,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
 });
+
+Route::post('/send-otp', [Otp::class, 'sendOtp'])->name('otp.send');

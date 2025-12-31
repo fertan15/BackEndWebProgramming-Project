@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 
-class Users extends Model
+class Users extends Model implements Authenticatable
 {
-    use HasFactory;
+    use HasFactory, AuthenticatableTrait;
 
     /**
      * Explicit table and primary key (matches SQL dump).
@@ -55,6 +57,21 @@ class Users extends Model
         'created_at' => 'datetime',
         'is_admin' => 'boolean',
     ];
+
+    /**
+     * Hidden attributes for serialization.
+     */
+    protected $hidden = [
+        'password_hash',
+    ];
+
+    /**
+     * Get the password for the user (Laravel Auth requires this).
+     */
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
 
     // Relationships (based on foreign keys in dump)
     public function listings()

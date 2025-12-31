@@ -1,3 +1,5 @@
+drop database if exists pocketraderdb;
+
 /*
 SQLyog Community v13.3.0 (64 bit)
 MySQL - 10.4.32-MariaDB : Database - pocketraderdb
@@ -219,7 +221,7 @@ CREATE TABLE `users` (
   `identity_status` enum('unverified','pending','verified','rejected') DEFAULT 'unverified',
   `otp_code` varchar(10) DEFAULT NULL,
   `otp_expires_at` timestamp NULL DEFAULT NULL,
-  `account_status` enum('active','suspended','banned') DEFAULT 'active',
+  `account_status` enum('active','suspended','banned', 'verify') DEFAULT 'verify',
   `ban_reason` varchar(255) DEFAULT NULL,
   `banned_at` timestamp NULL DEFAULT NULL,
   `is_admin` tinyint(1) DEFAULT 0,
