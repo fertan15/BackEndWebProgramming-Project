@@ -34,6 +34,7 @@ class AuthController extends Controller
 
         $request->session()->put('user_id', 1);
         $request->session()->put('user_name', $name);
+        
 
         return redirect('/home');
     }

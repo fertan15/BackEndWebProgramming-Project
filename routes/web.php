@@ -61,9 +61,11 @@ Route::get('/logout', [HomeController::class, 'logout'])->name('logout.get');
 
 // HOME Routes with auth middleware
 Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::post('/logout', [HomeController::class, 'logout'])->name('logout');
 });
+
+//ini ga di middleware soalnya kalo ga login masih isah liat2
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::post('/send-otp', [Otp::class, 'sendOtp'])->name('otp.send');
 

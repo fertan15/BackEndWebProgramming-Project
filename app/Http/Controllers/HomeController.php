@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cards;
 use App\Models\CardSets;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -15,7 +16,7 @@ class HomeController extends Controller
     {
         $user_id = $request->session()->get('user_id');
         $user_name = $request->session()->get('user_name', 'User');
-        
+
         return view('home', compact('user_id', 'user_name'));
     }
 
