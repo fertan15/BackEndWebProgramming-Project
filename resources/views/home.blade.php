@@ -1,44 +1,312 @@
-@extends('auth.layout.app')
+@extends('layout.main')
 
-@section('content')
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800">Welcome!</h1>
-            <p class="text-gray-600 mt-2">You are logged in</p>
-        </div>
+@section('main_contents')
+    <section class="section" style="width: 100%;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="pokemon-jumbo-xl mb-5">
+                        <div class="pokemon-jumbo-xl__overlay"></div>
+                        <div class="pokemon-jumbo-xl__glow"></div>
 
-        <!-- User Info -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <div class="mb-4">
-                <label class="text-sm text-gray-600">User ID:</label>
-                <p class="text-lg font-semibold text-gray-800">{{ $user_id ?? 'N/A' }}</p>
+                        <div class="pokemon-jumbo-xl__content">
+                            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                                <span class="pokemon-badge-xl">POKÉMON TRADING CARD GAME</span>
+                                <span class="pokemon-chip-xl">SV</span>
+                                <span class="pokemon-chip-xl">PF</span>
+                                <span class="pokemon-chip-xl">ME</span>
+                            </div>
+
+                            <h1 class="pokemon-jumbo-xl__title">Pokemon Card Collection</h1>
+                            <p class="pokemon-jumbo-xl__subtitle">
+                                Explore, collect, and trade — tampilkan koleksi kamu dengan style yang “TCG banget”.
+                            </p>
+
+                            <div class="d-flex flex-wrap gap-3 mt-4">
+                                <a href="{{ route('card_sets') }}" class="btn btn-warning pokemon-btn-xl">
+                                    View Card Sets
+                                </a>
+                                <a href="#cards-grid" class="btn btn-outline-light pokemon-btn-outline-xl">
+                                    Explore Cards
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- dekorasi mewah + animasi --}}
+                        <div class="pokeball-xl pokeball-xl--1"></div>
+                        <div class="pokeball-xl pokeball-xl--2"></div>
+                        <div class="spark spark--1"></div>
+                        <div class="spark spark--2"></div>
+                        <div class="spark spark--3"></div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label class="text-sm text-gray-600">Name:</label>
-                <p class="text-lg font-semibold text-gray-800">{{ $user_name ?? 'Guest' }}</p>
-            </div>
         </div>
-
-        <!-- Placeholder Content -->
-        <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Dashboard</h2>
-            <p class="text-gray-600 mb-4">This is a placeholder home page. Your main content goes here.</p>
-            <ul class="list-disc list-inside text-gray-600 space-y-2">
-                <li>Browse your listings</li>
-                <li>View your collection</li>
-                <li>Check your wallet balance</li>
-                <li>Manage your profile</li>
-            </ul>
-        </div>
-
-        <!-- Logout Link -->
-        <a href="{{ url('/logout') }}" class="block w-full text-center bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition duration-200">
-            Logout
-        </a>
-
-    </div>
-</div>
+    </section>
 @endsection
+
+<style>
+    /* ====== HERO XL ====== */
+    .pokemon-jumbo-xl {
+        position: relative;
+        overflow: hidden;
+        border-radius: 26px;
+        padding: 64px 56px;
+        min-height: 380px;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        box-shadow:
+            0 18px 55px rgba(0, 0, 0, 0.55),
+            inset 0 1px 0 rgba(255, 255, 255, 0.20);
+        transform: translateZ(0);
+    }
+
+    .pokemon-jumbo-xl__overlay {
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(1200px 500px at 20% 20%, rgba(255, 203, 5, 0.22), transparent 55%),
+            radial-gradient(900px 450px at 80% 30%, rgba(13, 110, 253, 0.22), transparent 55%),
+            linear-gradient(90deg, rgba(5, 5, 10, 0.82), rgba(5, 5, 10, 0.35));
+        backdrop-filter: blur(3px);
+    }
+
+    /* glow layer yang bergerak biar “premium” */
+    .pokemon-jumbo-xl__glow {
+        position: absolute;
+        inset: -40%;
+        background: conic-gradient(from 180deg,
+                rgba(255, 203, 5, 0.00),
+                rgba(255, 203, 5, 0.18),
+                rgba(13, 110, 253, 0.16),
+                rgba(255, 255, 255, 0.10),
+                rgba(255, 203, 5, 0.00));
+        filter: blur(18px);
+        opacity: .75;
+        animation: glowSpin 9s linear infinite;
+        z-index: 1;
+    }
+
+    @keyframes glowSpin {
+        0% {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        100% {
+            transform: rotate(360deg) scale(1.02);
+        }
+    }
+
+    .pokemon-jumbo-xl__content {
+        position: relative;
+        z-index: 3;
+        color: #fff;
+        max-width: 860px;
+    }
+
+    .pokemon-jumbo-xl__title {
+        font-weight: 900;
+        font-size: clamp(38px, 4vw, 62px);
+        letter-spacing: .6px;
+        margin: 0;
+        text-shadow:
+            0 4px 0 rgba(0, 0, 0, 0.40),
+            0 14px 35px rgba(0, 0, 0, 0.55);
+    }
+
+    .pokemon-jumbo-xl__subtitle {
+        margin-top: 16px;
+        margin-bottom: 0;
+        font-size: 18px;
+        line-height: 1.6;
+        opacity: .92;
+        max-width: 720px;
+    }
+
+    /* ====== BADGE & CHIPS ====== */
+    .pokemon-badge-xl {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 1px;
+        background: rgba(255, 203, 5, 0.96);
+        color: #141414;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+    }
+
+    .pokemon-chip-xl {
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 14px;
+        border-radius: 999px;
+        font-weight: 850;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(6px);
+    }
+
+    /* ====== BUTTONS ====== */
+    .pokemon-btn-xl {
+        font-weight: 900;
+        border-radius: 16px;
+        padding: 14px 18px;
+        min-width: 170px;
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.40);
+        transform: translateY(0);
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .pokemon-btn-xl:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 26px 45px rgba(0, 0, 0, 0.55);
+    }
+
+    .pokemon-btn-outline-xl {
+        font-weight: 900;
+        border-radius: 16px;
+        padding: 14px 18px;
+        min-width: 170px;
+        border-width: 2px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        transition: transform .18s ease, background-color .18s ease;
+    }
+
+    .pokemon-btn-outline-xl:hover {
+        transform: translateY(-3px);
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    /* ====== POKEBALL DECOR ====== */
+    .pokeball-xl {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 2;
+        opacity: .35;
+        background:
+            radial-gradient(circle at 50% 50%, #fff 0 20px, transparent 21px),
+            linear-gradient(#e53935 0 50%, #ffffff 50% 52%, #141414 52% 56%, #ffffff 56% 100%);
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
+        animation: floatyXL 4.8s ease-in-out infinite;
+    }
+
+    .pokeball-xl--1 {
+        width: 190px;
+        height: 190px;
+        right: -55px;
+        top: -55px;
+        transform: rotate(-10deg);
+    }
+
+    .pokeball-xl--2 {
+        width: 140px;
+        height: 140px;
+        left: -45px;
+        bottom: -50px;
+        top: auto;
+        right: auto;
+        opacity: .26;
+        animation-duration: 6.1s;
+        animation-delay: .7s;
+    }
+
+    @keyframes floatyXL {
+
+        0%,
+        100% {
+            transform: translateY(0) rotate(-10deg);
+        }
+
+        50% {
+            transform: translateY(14px) rotate(6deg);
+        }
+    }
+
+    /* ====== SPARKLES ====== */
+    .spark {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.85);
+        filter: blur(.3px);
+        z-index: 2;
+        animation: sparkle 2.4s ease-in-out infinite;
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.55);
+        opacity: .75;
+    }
+
+    .spark--1 {
+        left: 18%;
+        top: 22%;
+        animation-delay: .2s;
+    }
+
+    .spark--2 {
+        left: 64%;
+        top: 18%;
+        animation-delay: .8s;
+    }
+
+    .spark--3 {
+        left: 78%;
+        top: 56%;
+        animation-delay: 1.4s;
+    }
+
+    @keyframes sparkle {
+
+        0%,
+        100% {
+            transform: scale(.9);
+            opacity: .55;
+        }
+
+        50% {
+            transform: scale(1.45);
+            opacity: .95;
+        }
+    }
+
+    /* ====== Responsive ====== */
+    @media (max-width: 576px) {
+        .pokemon-jumbo-xl {
+            padding: 34px 20px;
+            min-height: 320px;
+            border-radius: 18px;
+        }
+
+        .pokemon-jumbo-xl__subtitle {
+            font-size: 15px;
+        }
+
+        .pokeball-xl--1 {
+            width: 140px;
+            height: 140px;
+            right: -45px;
+            top: -45px;
+        }
+
+        .pokeball-xl--2 {
+            width: 110px;
+            height: 110px;
+            left: -40px;
+            bottom: -45px;
+        }
+    }
+
+    /* Respect user motion settings */
+    @media (prefers-reduced-motion: reduce) {
+
+        .pokemon-jumbo-xl__glow,
+        .pokeball-xl,
+        .spark {
+            animation: none !important;
+        }
+    }
+</style>

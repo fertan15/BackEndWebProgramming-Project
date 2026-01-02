@@ -71,8 +71,7 @@
                             <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;">
                             
                             <p style="color: #9ca3af; font-size: 12px;">
-                                &copy; 2025 Nama Aplikasi Anda. All rights reserved.<br>
-                                Jalan Teknologi No. 123, Surabaya
+                                &copy; pockeTrader. All rights reserved.<br>
                             </p>
                         </td>
                     </tr>
