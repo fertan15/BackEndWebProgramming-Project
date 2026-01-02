@@ -51,17 +51,17 @@
                                     </div>
                                 </div>
                                 <div class="profile-meta">
-                                    <h5 class="text-bold text-dark mb-10">John Doe</h5>
+                                    <h5 class="text-bold text-dark mb-10">{{ Auth::user()->name }}</h5>
                                     <p class="text-sm text-gray">Web & UI/UX Design</p>
                                 </div>
                             </div>
                             <div class="input-style-1">
                                 <label>Email</label>
-                                <input type="email" placeholder="admin@example.com" value="admin@example.com" />
+                                <input type="email" placeholder="admin@example.com" value="{{ Auth::user()->email }}" />
                             </div>
                             <div class="input-style-1">
                                 <label>Password</label>
-                                <input type="password" value="admin@example.com" />
+                                <input type="password" value="{{ Auth::user()->password}}" />
                             </div>
                             <div class="input-style-1">
                                 <label>Website</label>

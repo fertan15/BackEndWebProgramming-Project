@@ -144,8 +144,8 @@
                                                                     <img src="assets/images/profile/profile-image.png" alt="" />
                                                                 </div>
                                                                 <div>
-                                                                    <h6 class="fw-500">Admin</h6>
-                                                                    <p>Admin</p>
+                                                                    <h6 class="fw-500" style="text-align: right;">{{ Auth::user()->name }}</h6>
+                                                                    <p style="text-align: right;">{{ Auth::user()->email }}</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -157,9 +157,9 @@
                                                                     <img src="assets/images/profile/profile-image.png" alt="image">
                                                                 </div>
                                                                 <div class="content">
-                                                                    <h4 class="text-sm">Adam Joe</h4>
+                                                                    <h4 class="text-sm">{{ Auth::user()->name }}</h4>
                                                                     <a class="text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white text-xs"
-                                                                        href="#">Email@gmail.com</a>
+                                                                        href="#">{{ Auth::user()->email }}</a>
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -182,7 +182,7 @@
                                                         </li>
                                                         <li class="divider"></li>
                                                         <li>
-                                                            <a href="#0"> <i class="lni lni-exit"></i> Sign Out </a>
+                                                            <a href="{{ route('logout') }}"> <i class="lni lni-exit"></i> Sign Out </a>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -191,17 +191,20 @@
 
 
                             @guest
-                                <div class="profile-info">
-                                    <div class="info">
-                                        <div class="image">
-                                            <img src="assets/images/profile/profile-image.png" alt="" />
-                                        </div>
-                                        <div>
-                                            <h6 class="fw-500">Log In</h6>
-                                            <p>To Continue</p>
+                                <button onclick="location.href='/login'" class="border-0 bg-transparent">
+
+                                    <div class="profile-info text-left">
+                                        <div class="info">
+                                            <div class="image">
+                                                <img src="assets/images/profile/profile-image.png" alt="" />
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-500" style="text-align: right;">Log In</h6>
+                                                <p style="text-align: right;">To Continue</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
                             @endguest
                     <!-- profile end -->
                 </div>

@@ -3,6 +3,13 @@
 @section('title', 'Login')
 
 @section('content')
+
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-sm text-red-700">{{ session('error') }}</p>
+        </div>
+    @endif
+
     <div class="max-w-xl">
         <form method="POST" action="/login" class="space-y-5">
             @csrf

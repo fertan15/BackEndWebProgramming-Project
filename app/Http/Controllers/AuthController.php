@@ -27,18 +27,44 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // Placeholder auth: store minimal session and redirect to home
-        // In a real app, validate credentials and fetch user from DB.
-        $email = $request->input('email');
-        $name = $request->input('name') ?? ($email ? explode('@', $email)[0] : 'User');
+        // Validate input
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
 
-        $request->session()->put('user_id', 1);
-        $request->session()->put('user_name', $name);
+        // Find user by email
+        $user = Users::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            return back()->with('error', 'Invalid email or password.');
+        }
+
+        // Try to verify password
+        $passwordValid = false;
         
+        try {
+            // Try Bcrypt verification first
+            $passwordValid = Hash::check($credentials['password'], $user->password_hash);
+        } catch (\Exception $e) {
+            // If Bcrypt fails, try plain text comparison (for testing/legacy data)
+            $passwordValid = ($credentials['password'] === $user->password_hash);
+        }
+
+        if (!$passwordValid) {
+            return back()->with('error', 'Invalid email or password.');
+        }
+
+        // Check if account is active
+        if ($user->account_status !== 'active') {
+            return back()->with('error', 'Your account is not active. Please complete registration.');
+        }
+
+        // Log the user in using Auth
+        Auth::login($user);
 
         return redirect('/home');
     }
-
     /**
      * Display the first registration step (Basic Details).
      */
