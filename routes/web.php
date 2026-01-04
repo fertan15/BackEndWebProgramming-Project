@@ -76,6 +76,8 @@ Route::post('/send-otp', [Otp::class, 'sendOtp'])->name('otp.send');
 Route::get('/card_sets', [HomeController::class, 'showCardSets'])->name('card_sets');
 Route::get('/viewprofile', [HomeController::class, 'viewprofile'])->name('view_profile');
 Route::get('/cards',  [HomeController::class, 'showCard'])->name('cards');
+Route::get('/wishlist', [HomeController::class, 'showWishlist'])->name('wishlist');
+Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist'])->name('wishlist.toggle');
 Route::get('/dashboard', function () {
     // In a real app, this view would be in resources/views/dashboard.blade.php
     return "<h1>Dashboard</h1><p>You have successfully logged in or registered!</p><p>Message: Registration Complete! Welcome to PocketRader.</p>";

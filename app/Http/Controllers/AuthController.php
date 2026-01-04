@@ -63,6 +63,10 @@ class AuthController extends Controller
         // Log the user in using Auth
         Auth::login($user);
 
+        // Set session variables for the application
+        $request->session()->put('user_id', $user->id);
+        $request->session()->put('user_name', $user->name);
+
         return redirect('/home');
     }
     /**
@@ -209,6 +213,10 @@ class AuthController extends Controller
 
         // Log the user in
         Auth::login($user);
+
+        // Set session variables for the application
+        $request->session()->put('user_id', $user->id);
+        $request->session()->put('user_name', $user->name);
 
         // Clear registration data from session upon completion
         $request->session()->forget(['register.email', 'register.phone', 'register.user_id', 'register.otp_verified']);

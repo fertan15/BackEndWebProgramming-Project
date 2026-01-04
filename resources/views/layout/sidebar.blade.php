@@ -50,6 +50,9 @@
                     <li>
                         <a href="blank-page.html"> Blank Page </a>
                     </li>
+                    <li>
+                        <a href="{{ route('wishlist') }}"> Wishlist </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item">
