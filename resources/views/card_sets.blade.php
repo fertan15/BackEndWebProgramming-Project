@@ -8,7 +8,7 @@
                     <div class="col-md-6">
                         <div class="title">
                             <strong>
-                                <h2>Pokemon Card</h2>
+                                <h2>Pokemon Card Sets</h2>
                             </strong>
                         </div>
                     </div>
@@ -17,11 +17,11 @@
                             <strong>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb">
-                                        <li class="breadcrumb-item" aria-current="page">
-                                            Card Sets
+                                        <li class="breadcrumb-item">
+                                            <a href="{{ route('home') }}">Home</a>
                                         </li>
-                                        <li class="breadcrumb-item" >
-                                            <a href="{{ route('cards') }}">Cards</a>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            Card Sets
                                         </li>
                                     </ol>
                                 </nav>
@@ -31,17 +31,31 @@
                 </div>
             </div>
             <div class="row g-4">
-                @foreach ($card_set as $item)
-                    <div class="col-xl-3 col-lg-3 col-sm-6">
-                        <div class="card">
-                            <img src="{{ asset('images/card_set/' . $item->image_url) }}" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $item->name }}</h5>
-                                <a href="#" class="btn btn-primary">Trade</a>
+                @forelse ($card_set as $set)
+                    <div class="col-xl-3 col-lg-4 col-sm-6">
+                        <div class="card h-100">
+                            <img src="{{ asset($set->image_url) }}" class="card-img-top" alt="{{ $set->name }}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ $set->name }}</h5>
+                                <p class="card-text text-muted small">
+                                    {{ $set->total_cards }} cards • Released {{ $set->release_date->format('M Y') }}
+                                </p>
+                                @if($set->description)
+                                    <p class="card-text small mb-3">{{ Str::limit($set->description, 100) }}</p>
+                                @endif
+                                <a href="{{ route('set.cards', $set->id) }}" class="btn btn-primary mt-auto">
+                                    View Cards
+                                </a>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            No card sets available at the moment.
+                        </div>
+                    </div>
+                @endforelse
             </div>
             <br>
         </div>

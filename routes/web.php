@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CardController;  
 use App\Http\Controllers\Otp;
 
 /*
@@ -69,13 +70,20 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::post('/send-otp', [Otp::class, 'sendOtp'])->name('otp.send');
 
-
-
-
 //home
-Route::get('/card_sets', [HomeController::class, 'showCardSets'])->name('card_sets');
+Route::get('/card_sets', [CardController::class, 'showCardSets'])->name('card_sets');
+
+//buat ngambil kartu dari set mana
+Route::get('/sets/{setId}/cards', [CardController::class, 'showCards'])->name('set.cards');
+
+// buat nampilin semua kartu
+Route::get('/cards', [CardController::class, 'showAllCards'])->name('cards');
+
+// nampilin individu
+Route::get('/cards/{cardId}', [CardController::class, 'showCardDetail'])->name('card.detail');
+
 Route::get('/viewprofile', [HomeController::class, 'viewprofile'])->name('view_profile');
-Route::get('/cards',  [HomeController::class, 'showCard'])->name('cards');
+// Route::get('/cards',  [HomeController::class, 'showCard'])->name('cards'); 
 Route::get('/wishlist', [HomeController::class, 'showWishlist'])->name('wishlist');
 Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist'])->name('wishlist.toggle');
 Route::get('/dashboard', function () {

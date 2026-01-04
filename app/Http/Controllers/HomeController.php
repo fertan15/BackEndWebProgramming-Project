@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cards;
-use App\Models\CardSets;
 use App\Models\Wishlists;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -30,36 +27,12 @@ class HomeController extends Controller
         return redirect('/login');
     }
 
-
-    public function showCard(Request $request)
-    {
-        $userId = $request->session()->get('user_id');
-        $param['cards'] = Cards::get();
-        
-        // Get wishlist card IDs for the current user
-        if ($userId) {
-            $wishlistCardIds = Wishlists::where('user_id', $userId)
-                                        ->pluck('card_id')
-                                        ->toArray();
-            $param['wishlistCardIds'] = $wishlistCardIds;
-        } else {
-            $param['wishlistCardIds'] = [];
-        }
-        
-        return view('cards', $param);
-    }
-    public function showCardSets()
-    {
-        $param['card_set'] = CardSets::get();
-        return view('card_sets', $param);
-    }
+    /**
+     * View profile page.
+     */
     public function viewprofile()
     {
         return view('view_profile');
-    }
-    public function showHome()
-    {
-        return view('home');
     }
 
     /**
@@ -75,7 +48,7 @@ class HomeController extends Controller
 
         // Get wishlist items with card details
         $wishlistItems = Wishlists::where('user_id', $userId)
-                                   ->with('card')
+                                   ->with('card.cardSet')
                                    ->orderBy('added_at', 'desc')
                                    ->get();
 
