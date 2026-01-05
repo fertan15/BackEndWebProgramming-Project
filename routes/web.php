@@ -17,11 +17,8 @@ use App\Http\Controllers\Otp;
 */
 
 // Default route: go to home if logged in, otherwise login
-Route::get('/', function () {
-    if (session()->has('user_id')) {
-        return redirect('/home');
-    }
-    return redirect('/login');
+Route::fallback(function () {
+    return redirect('/home'); // or any other default page
 });
 
 // LOGIN Routes (GET to show the form, POST to submit the data)
