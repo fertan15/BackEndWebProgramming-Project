@@ -66,6 +66,7 @@ class AuthController extends Controller
         // Set session variables for the application
         $request->session()->put('user_id', $user->id);
         $request->session()->put('user_name', $user->name);
+        $request->session()->put('is_admin', (bool) $user->is_admin);
 
         return redirect('/home');
     }

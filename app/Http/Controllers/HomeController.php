@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cards;
-use App\Models\CardSets;
 use App\Models\Wishlists;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -30,36 +27,12 @@ class HomeController extends Controller
         return redirect('/login');
     }
 
-
-    public function showCard(Request $request)
-    {
-        $userId = $request->session()->get('user_id');
-        $param['cards'] = Cards::get();
-        
-        // Get wishlist card IDs for the current user
-        if ($userId) {
-            $wishlistCardIds = Wishlists::where('user_id', $userId)
-                                        ->pluck('card_id')
-                                        ->toArray();
-            $param['wishlistCardIds'] = $wishlistCardIds;
-        } else {
-            $param['wishlistCardIds'] = [];
-        }
-        
-        return view('cards', $param);
-    }
-    public function showCardSets()
-    {
-        $param['card_set'] = CardSets::get();
-        return view('card_sets', $param);
-    }
+    /**
+     * View profile page.
+     */
     public function viewprofile()
     {
         return view('view_profile');
-    }
-    public function showHome()
-    {
-        return view('home');
     }
 
     /**
@@ -75,7 +48,7 @@ class HomeController extends Controller
 
         // Get wishlist items with card details
         $wishlistItems = Wishlists::where('user_id', $userId)
-                                   ->with('card')
+                                   ->with('card.cardSet')
                                    ->orderBy('added_at', 'desc')
                                    ->get();
 
@@ -90,6 +63,12 @@ class HomeController extends Controller
         $userId = $request->session()->get('user_id');
         
         if (!$userId) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Please login to add items to wishlist'
+                ], 401);
+            }
+
             return redirect()->route('login')->with('error', 'Please login to add items to wishlist');
         }
 
@@ -101,6 +80,16 @@ class HomeController extends Controller
         if ($wishlistItem) {
             // Remove from wishlist
             $wishlistItem->delete();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'action' => 'removed',
+                    'message' => 'Removed from wishlist',
+                    'in_wishlist' => false
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Removed from wishlist');
         } else {
             // Add to wishlist
@@ -108,6 +97,16 @@ class HomeController extends Controller
                 'user_id' => $userId,
                 'card_id' => $cardId
             ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'action' => 'added',
+                    'message' => 'Added to wishlist',
+                    'in_wishlist' => true
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Added to wishlist');
         }
     }
