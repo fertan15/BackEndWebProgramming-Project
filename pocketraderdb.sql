@@ -343,11 +343,11 @@ CREATE TABLE `users` (
 /*Data for the table `users` */
 
 insert  into `users`(`id`,`name`,`username`,`password_hash`,`email`,`phone_number`,`balance`,`identity_type`,`identity_number`,`identity_image_url`,`identity_status`,`otp_code`,`otp_expires_at`,`account_status`,`ban_reason`,`banned_at`,`is_admin`,`last_online`,`created_at`) values 
-(1,'Benny Example','benny','$2y$10$examplehash1','benny@example.com','+62111111111',100.00,'KTP','KTP-001','https://img.example.com/id/ktp-001.jpg','verified',NULL,NULL,'active',NULL,NULL,1,'2025-12-01 10:00:00','2025-11-01 09:00:00'),
-(2,'Alice Seller','alice','$2y$10$examplehash2','alice@example.com','+62122222222',50.00,'SIM','SIM-002','https://img.example.com/id/sim-002.jpg','verified',NULL,NULL,'active',NULL,NULL,0,'2025-12-02 11:00:00','2025-11-02 09:00:00'),
-(3,'Bob Seller','bob','$2y$10$examplehash3','bob@example.com','+62133333333',75.00,'Passport','PASS-003','https://img.example.com/id/pass-003.jpg','pending',NULL,NULL,'active',NULL,NULL,0,'2025-12-03 12:00:00','2025-11-03 09:00:00'),
-(4,'Carla Buyer','carla','$2y$10$examplehash4','carla@example.com','+62144444444',200.00,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2025-12-04 13:00:00','2025-11-04 09:00:00'),
-(5,'Derek Buyer','derek','$2y$10$examplehash5','derek@example.com','+62155555555',150.00,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2025-12-05 14:00:00','2025-11-05 09:00:00');
+(1,'Benny Example','benny','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','benny@example.com','+62111111111',100.00,'KTP','KTP-001','https://img.example.com/id/ktp-001.jpg','verified',NULL,NULL,'active',NULL,NULL,1,'2025-12-01 10:00:00','2025-11-01 09:00:00'),
+(2,'Alice Seller','alice','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','alice@example.com','+62122222222',50.00,'SIM','SIM-002','https://img.example.com/id/sim-002.jpg','verified',NULL,NULL,'active',NULL,NULL,0,'2025-12-02 11:00:00','2025-11-02 09:00:00'),
+(3,'Bob Seller','bob','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','bob@example.com','+62133333333',75.00,'Passport','PASS-003','https://img.example.com/id/pass-003.jpg','pending',NULL,NULL,'active',NULL,NULL,0,'2025-12-03 12:00:00','2025-11-03 09:00:00'),
+(4,'Carla Buyer','carla','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','carla@example.com','+62144444444',200.00,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2025-12-04 13:00:00','2025-11-04 09:00:00'),
+(5,'Derek Buyer','derek','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','derek@example.com','+62155555555',150.00,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2025-12-05 14:00:00','2025-11-05 09:00:00');
 
 /*Table structure for table `wallet_transactions` */
 

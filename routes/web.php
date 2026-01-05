@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CardController;  
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Otp;
 
 /*
@@ -89,4 +90,15 @@ Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist
 Route::get('/dashboard', function () {
     // In a real app, this view would be in resources/views/dashboard.blade.php
     return "<h1>Dashboard</h1><p>You have successfully logged in or registered!</p><p>Message: Registration Complete! Welcome to PocketRader.</p>";
+});
+
+// Admin area
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/requests', [AdminController::class, 'requests'])->name('requests');
+    Route::post('/requests/{id}/approve', [AdminController::class, 'approveRequest'])->name('requests.approve');
+    Route::post('/requests/{id}/reject', [AdminController::class, 'rejectRequest'])->name('requests.reject');
+    Route::get('/cards/create', [AdminController::class, 'createCardForm'])->name('cards.create');
+    Route::post('/cards', [AdminController::class, 'storeCard'])->name('cards.store');
 });

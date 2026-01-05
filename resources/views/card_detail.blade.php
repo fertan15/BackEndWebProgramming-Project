@@ -16,6 +16,8 @@
         </div>
 
         <div class="row">
+            <div id="wishlist-feedback" class="mb-3"></div>
+
             <!-- Left Column: Card Image & Actions -->
             <div class="col-lg-5 col-xl-4">
                 <div class="card mb-4">
@@ -50,14 +52,19 @@
                                 <i class="lni lni-cart"></i> Buy Now (Coming Soon)
                             </button>
                             
-                            <form action="{{ route('wishlist.toggle', $card->id) }}" method="POST">
+                            <form action="{{ route('wishlist.toggle', $card->id) }}" method="POST" class="wishlist-toggle-form">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger w-100">
-                                    @if($isInWishlist)
-                                        <i class="lni lni-heart-filled"></i> Remove from Wishlist
-                                    @else
-                                        <i class="lni lni-heart"></i> Add to Wishlist
-                                    @endif
+                                <button type="submit" 
+                                        class="btn btn-outline-danger w-100 wishlist-toggle-btn" 
+                                        data-card-id="{{ $card->id }}"
+                                        data-in-wishlist="{{ $isInWishlist ? '1' : '0' }}">
+                                    <span class="wishlist-button-label">
+                                        @if($isInWishlist)
+                                            <i class="lni lni-heart-filled"></i> Remove from Wishlist
+                                        @else
+                                            <i class="lni lni-heart"></i> Add to Wishlist
+                                        @endif
+                                    </span>
                                 </button>
                             </form>
                         </div>
@@ -268,6 +275,69 @@ const priceChart = new Chart(ctx, {
                 }
             }
         }
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const toggleUrl = "{{ url('/wishlist/toggle') }}";
+    const feedback = document.getElementById('wishlist-feedback');
+    const form = document.querySelector('.wishlist-toggle-form');
+    const button = document.querySelector('.wishlist-toggle-btn');
+    const label = document.querySelector('.wishlist-button-label');
+
+    const showMessage = (type, text) => {
+        if (!feedback) return;
+        feedback.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${text}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+    };
+
+    if (form && button && label) {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const cardId = button.dataset.cardId;
+            const previousContent = label.innerHTML;
+            button.disabled = true;
+            label.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            try {
+                const response = await fetch(`${toggleUrl}/${cardId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Unable to update wishlist');
+                }
+
+                const inWishlist = data.in_wishlist === true;
+                button.dataset.inWishlist = inWishlist ? '1' : '0';
+                button.classList.toggle('btn-outline-danger', !inWishlist);
+                button.classList.toggle('btn-danger', inWishlist);
+                label.innerHTML = inWishlist
+                    ? '<i class="lni lni-heart-filled"></i> Remove from Wishlist'
+                    : '<i class="lni lni-heart"></i> Add to Wishlist';
+
+                showMessage('success', data.message || 'Wishlist updated');
+            } catch (error) {
+                label.innerHTML = previousContent;
+                showMessage('danger', error.message || 'Something went wrong');
+            } finally {
+                button.disabled = false;
+            }
+        });
     }
 });
 </script>

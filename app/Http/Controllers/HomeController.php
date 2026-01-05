@@ -63,6 +63,12 @@ class HomeController extends Controller
         $userId = $request->session()->get('user_id');
         
         if (!$userId) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Please login to add items to wishlist'
+                ], 401);
+            }
+
             return redirect()->route('login')->with('error', 'Please login to add items to wishlist');
         }
 
@@ -74,6 +80,16 @@ class HomeController extends Controller
         if ($wishlistItem) {
             // Remove from wishlist
             $wishlistItem->delete();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'action' => 'removed',
+                    'message' => 'Removed from wishlist',
+                    'in_wishlist' => false
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Removed from wishlist');
         } else {
             // Add to wishlist
@@ -81,6 +97,16 @@ class HomeController extends Controller
                 'user_id' => $userId,
                 'card_id' => $cardId
             ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'success',
+                    'action' => 'added',
+                    'message' => 'Added to wishlist',
+                    'in_wishlist' => true
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Added to wishlist');
         }
     }

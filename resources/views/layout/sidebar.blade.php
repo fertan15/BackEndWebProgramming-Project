@@ -29,6 +29,34 @@
                     </li>
                 </ul>
             </li>
+
+            @if(session('is_admin'))
+            <li class="nav-item nav-item-has-children">
+                <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_admin"
+                    aria-controls="ddmenu_admin" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 1.66666L2.5 5.83332V9.16666C2.5 13.2917 5.46667 17.1583 10 18.3333C14.5333 17.1583 17.5 13.2917 17.5 9.16666V5.83332L10 1.66666Z" stroke="#4A6CF7" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 18.3333V9.16666" stroke="#4A6CF7" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9.16668L17.5 5.83334" stroke="#4A6CF7" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 9.16668L2.5 5.83334" stroke="#4A6CF7" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="text">Admin</span>
+                </a>
+                <ul id="ddmenu_admin" class="collapse dropdown-nav">
+                    <li>
+                        <a href="{{ route('admin.users') }}"> Users </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.requests') }}"> Requests </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.cards.create') }}"> Create Card </a>
+                    </li>
+                </ul>
+            </li>
+            @endif
             <li class="nav-item nav-item-has-children">
                 <a href="#0" class="collapsed" data-bs-toggle="collapse" data-bs-target="#ddmenu_2"
                     aria-controls="ddmenu_2" aria-expanded="false" aria-label="Toggle navigation">
