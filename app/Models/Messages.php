@@ -18,6 +18,7 @@ class Messages extends Model
         'sender_id',
         'content',
         'sent_at',
+        'read'
     ];
 
     protected $casts = [

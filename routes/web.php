@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CardController;  
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\chatController;
 use App\Http\Controllers\Otp;
 
 /*
@@ -88,6 +89,13 @@ Route::get('/dashboard', function () {
     // In a real app, this view would be in resources/views/dashboard.blade.php
     return "<h1>Dashboard</h1><p>You have successfully logged in or registered!</p><p>Message: Registration Complete! Welcome to PocketRader.</p>";
 });
+Route::get('/chat', [chatController::class, 'chat'])->name('chat');
+Route::post('/chat/start', [chatController::class, 'start'])->name('chat.start');
+Route::get('/chat/{chat}/messages', [chatController::class, 'messages'])->name('chat.messages');
+Route::post('/chat/{chat}/message', [chatController::class, 'sendMessage'])->name('chat.message.send');
+
+
+
 
 // Admin area
 Route::prefix('admin')->name('admin.')->group(function () {
