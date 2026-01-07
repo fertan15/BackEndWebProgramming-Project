@@ -9,6 +9,7 @@
                 <small class="text-muted">Admin • upload new card to a set</small>
             </div>
             <div>
+                <a href="{{ route('admin.card_sets.create') }}" class="btn btn-outline-info me-2">Create Card Set</a>
                 <a href="{{ route('admin.users') }}" class="btn btn-outline-secondary">Back to Users</a>
             </div>
         </div>
