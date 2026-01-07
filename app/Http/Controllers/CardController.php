@@ -15,7 +15,10 @@ class CardController extends Controller
      */
     public function showCardSets()
     {
-        $cardSets = CardSets::orderBy('release_date', 'desc')->get();
+        // Load sets with dynamic count of related cards
+        $cardSets = CardSets::withCount('cards')
+            ->orderBy('release_date', 'desc')
+            ->get();
         
         return view('card_sets', [
             'card_set' => $cardSets

@@ -46,4 +46,41 @@ class Cards extends Model
     {
         return $this->hasMany(UserCollections::class, 'card_id');
     }
+
+    protected static function booted()
+    {
+        // When a card is created, update its set's total_cards to match actual count
+        static::created(function (Cards $card) {
+            $setId = $card->card_set_id;
+            if ($setId) {
+                $actual = self::where('card_set_id', $setId)->count();
+                CardSets::where('id', $setId)->update(['total_cards' => $actual]);
+            }
+        });
+
+        // If a card's set changes, resync counts for both old and new sets
+        static::updated(function (Cards $card) {
+            if ($card->isDirty('card_set_id')) {
+                $originalSetId = $card->getOriginal('card_set_id');
+                $newSetId = $card->card_set_id;
+                if ($originalSetId) {
+                    $originalCount = self::where('card_set_id', $originalSetId)->count();
+                    CardSets::where('id', $originalSetId)->update(['total_cards' => $originalCount]);
+                }
+                if ($newSetId) {
+                    $newCount = self::where('card_set_id', $newSetId)->count();
+                    CardSets::where('id', $newSetId)->update(['total_cards' => $newCount]);
+                }
+            }
+        });
+
+        // Keep counts accurate when a card is deleted
+        static::deleted(function (Cards $card) {
+            $setId = $card->card_set_id;
+            if ($setId) {
+                $actual = self::where('card_set_id', $setId)->count();
+                CardSets::where('id', $setId)->update(['total_cards' => $actual]);
+            }
+        });
+    }
 }

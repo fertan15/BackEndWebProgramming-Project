@@ -54,7 +54,6 @@ class AdminController extends Controller
             'name' => 'required|string|max:255|unique:card_sets,name',
             'release_date' => 'nullable|date',
             'description' => 'nullable|string|max:1000',
-            'total_cards' => 'required|integer|min:1',
             'image' => 'required|image|max:2048',
         ]);
 
@@ -77,7 +76,6 @@ class AdminController extends Controller
             'name' => $validated['name'],
             'release_date' => $validated['release_date'] ?? null,
             'description' => $validated['description'] ?? null,
-            'total_cards' => $validated['total_cards'] ?? 0,
             'image_url' => $imagePath,
         ]);
 
@@ -168,6 +166,11 @@ class AdminController extends Controller
             'estimated_market_price' => $validated['estimated_market_price'] ?? 0,
             'image_url' => $imagePath,
         ]);
+
+        // Keep card set count in sync with actual cards
+        $setId = $validated['card_set_id'];
+        $actualCount = Cards::where('card_set_id', $setId)->count();
+        CardSets::where('id', $setId)->update(['total_cards' => $actualCount]);
 
         return redirect()
             ->route('admin.cards.create')
