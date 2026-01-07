@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CardController;  
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\chatController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Otp;
 
 /*
@@ -93,6 +94,20 @@ Route::get('/chat', [chatController::class, 'chat'])->name('chat');
 Route::post('/chat/start', [chatController::class, 'start'])->name('chat.start');
 Route::get('/chat/{chat}/messages', [chatController::class, 'messages'])->name('chat.messages');
 Route::post('/chat/{chat}/message', [chatController::class, 'sendMessage'])->name('chat.message.send');
+
+// Notifications routes
+// Index is accessible to everyone (guests see system-wide, users see personal + system-wide)
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+// Actions require authentication
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markRead');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
+});
 
 
 

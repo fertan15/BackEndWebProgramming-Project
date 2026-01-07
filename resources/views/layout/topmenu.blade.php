@@ -104,7 +104,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#0">
+                                <a href="{{ route('notifications.index') }}">
                                     <i class="lni lni-alarm"></i> Notifications
                                 </a>
                             </li>

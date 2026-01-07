@@ -404,3 +404,32 @@ insert  into `wishlists`(`id`,`user_id`,`card_id`,`added_at`) values
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Create notifications table with nullable user_id for system-wide notifications
+CREATE TABLE IF NOT EXISTS `notifications` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned DEFAULT NULL COMMENT 'NULL means notification is for all users',
+  `type` varchar(255) NOT NULL COMMENT 'order, message, listing, system, wishlist',
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `action_url` varchar(255) DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `read_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `notifications_user_id_index` (`user_id`),
+  KEY `notifications_is_read_index` (`is_read`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert sample notifications
+-- User-specific notifications (replace 1 with actual user ID)
+INSERT INTO `notifications` (`user_id`, `type`, `title`, `message`, `action_url`, `is_read`, `read_at`, `created_at`, `updated_at`) VALUES
+(1, 'order', 'Order Placed Successfully', 'Your order #12345 has been placed successfully and is being processed.', '/orders/12345', 0, NULL, NOW(), NOW()),
+(1, 'message', 'New Message from John Doe', 'You have received a new message: "Hi, is this card still available?"', '/chat', 0, NULL, NOW(), NOW()),
+(1, 'listing', 'New Card Listed in Your Watchlist', 'A Pikachu card matching your search criteria has been listed for $25.00', '/cards/123', 1, DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY), NOW());
+
+-- System-wide notifications (user_id is NULL, visible to all users)
+INSERT INTO `notifications` (`user_id`, `type`, `title`, `message`, `action_url`, `is_read`, `read_at`, `created_at`, `updated_at`) VALUES
+(NULL, 'system', 'Platform Maintenance Scheduled', 'PocketRader will undergo scheduled maintenance on Jan 15, 2026 from 2-4 AM EST.', '/home', 0, NULL, NOW(), NOW()),
+(NULL, 'system', 'New Feature: Enhanced Search', 'We have added advanced search filters to help you find cards faster!', '/cards', 0, NULL, DATE_SUB(NOW(), INTERVAL 2 DAY), NOW());

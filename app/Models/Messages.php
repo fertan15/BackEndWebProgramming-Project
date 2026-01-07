@@ -17,8 +17,7 @@ class Messages extends Model
         'chat_id',
         'sender_id',
         'content',
-        'sent_at',
-        'read'
+        'sent_at'
     ];
 
     protected $casts = [
