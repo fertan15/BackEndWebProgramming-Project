@@ -7,8 +7,9 @@ use App\Http\Controllers\TopUpController;
 use App\Http\Controllers\CardController;  
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\chatController;
-use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Otp;
+use App\Http\Controllers\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,15 +97,22 @@ Route::post('/chat/start', [chatController::class, 'start'])->name('chat.start')
 Route::get('/chat/{chat}/messages', [chatController::class, 'messages'])->name('chat.messages');
 Route::post('/chat/{chat}/message', [chatController::class, 'sendMessage'])->name('chat.message.send');
 
+// Notifications routes
+// Index is accessible to everyone (guests see system-wide, users see personal + system-wide)
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
-//route buat checkout 
-Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
-Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->name('purchase.process');
+// Actions require authentication
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markRead');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
+});
 
-//route top up 
-Route::get('/topup', [TopUpController::class, 'show'])->name('topup.show');
-Route::post('/topup/snap', [TopUpController::class, 'getSnapToken'])->name('topup.snap');
-Route::post('/midtrans-notification', [TopUpController::class, 'handleNotification']);
+
+
 
 // Admin area
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -113,6 +121,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/requests', [AdminController::class, 'requests'])->name('requests');
     Route::post('/requests/{id}/approve', [AdminController::class, 'approveRequest'])->name('requests.approve');
     Route::post('/requests/{id}/reject', [AdminController::class, 'rejectRequest'])->name('requests.reject');
+    Route::get('/card-sets/create', [AdminController::class, 'createCardSetForm'])->name('card_sets.create');
+    Route::post('/card-sets', [AdminController::class, 'storeCardSet'])->name('card_sets.store');
     Route::get('/cards/create', [AdminController::class, 'createCardForm'])->name('cards.create');
     Route::post('/cards', [AdminController::class, 'storeCard'])->name('cards.store');
 });

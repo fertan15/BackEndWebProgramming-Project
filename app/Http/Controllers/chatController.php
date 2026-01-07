@@ -36,10 +36,9 @@ class chatController extends Controller
                                    ->orderBy('sent_at', 'desc')
                                    ->first();
             
-            // Count unread messages for this chat (messages sent by other person that are not read)
             $unreadCount = Messages::where('chat_id', $chat->id)
                                    ->where('sender_id', '!=', $currentUserId)
-                                   ->where('read', 0)  // Only count unread messages
+                                   ->where('read', 0)
                                    ->count();
             
             $chatsList[] = [
@@ -47,7 +46,8 @@ class chatController extends Controller
                 'avatar' => $otherPerson->identity_image_url ?? 'https://i.pravatar.cc/150?img=1',
                 'is_online' => true,
                 'unread_count' => $unreadCount,
-                'time' => $lastMessage ? $lastMessage->sent_at->format('g:i A') : 'No messages',
+                // Use ISO 8601 with timezone to ensure consistent client-side formatting
+                'time' => $lastMessage ? $lastMessage->sent_at->toIso8601String() : null,
                 'last_message' => $lastMessage ? $lastMessage->content : 'No messages yet',
                 'chat_id' => $chat->id,
                 'user_id' => $otherPersonId,
@@ -129,7 +129,8 @@ class chatController extends Controller
                 'avatar' => $otherUser->identity_image_url ?? 'https://i.pravatar.cc/150?img=1',
                 'is_online' => true,
                 'unread_count' => 0,
-                'time' => $lastMessage ? $lastMessage->sent_at->format('g:i A') : Carbon::now()->format('g:i A'),
+                // ISO 8601 timestamp; client will localize display
+                'time' => ($lastMessage ? $lastMessage->sent_at : Carbon::now())->toIso8601String(),
                 'last_message' => $lastMessage ? $lastMessage->content : ($messageText ?: 'No messages yet'),
             ],
         ]);
@@ -142,7 +143,6 @@ class chatController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Mark all messages from the other user as read when opening the chat
         Messages::where('chat_id', $chat->id)
             ->where('sender_id', '!=', $currentUserId)
             ->where('read', 0)
@@ -156,7 +156,9 @@ class chatController extends Controller
                                     'id' => $m->id,
                                     'sender_id' => $m->sender_id,
                                     'content' => $m->content,
-                                    'sent_at' => $m->sent_at ? $m->sent_at->format('Y-m-d H:i:s') : null,
+                                    'read' => $m->read,
+                                    // ISO 8601 to include timezone info for correct client parsing
+                                    'sent_at' => $m->sent_at ? $m->sent_at->toIso8601String() : null,
                                 ];
                             });
 
@@ -188,7 +190,9 @@ class chatController extends Controller
                 'id' => $message->id,
                 'sender_id' => $message->sender_id,
                 'content' => $message->content,
-                'sent_at' => $message->sent_at->format('Y-m-d H:i:s'),
+                'read' => $message->read,
+                // ISO 8601 for consistency
+                'sent_at' => $message->sent_at->toIso8601String(),
             ],
         ]);
     }

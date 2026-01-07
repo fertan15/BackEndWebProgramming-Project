@@ -38,7 +38,7 @@
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ $set->name }}</h5>
                                 <p class="card-text text-muted small">
-                                    {{ $set->total_cards }} cards • Released {{ $set->release_date->format('M Y') }}
+                                    {{ $set->cards_count }} cards • Released {{ $set->release_date->format('M Y') }}
                                 </p>
                                 @if($set->description)
                                     <p class="card-text small mb-3">{{ Str::limit($set->description, 100) }}</p>

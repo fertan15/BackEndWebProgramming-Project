@@ -34,12 +34,12 @@
                         overflow: hidden;
                         border: 1px solid var(--chat-border);
                         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                        position: relative; /* Context for absolute positioning if needed */
+                        position: relative; 
                     }
 
                     /* --- VIEW 1: FULL WIDTH LIST (SIDEBAR) --- */
                     .chat-list-view {
-                        width: 100%; /* Full width */
+                        width: 100%;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
@@ -88,7 +88,7 @@
                     .chat-item {
                         display: flex;
                         align-items: center;
-                        padding: 20px 30px; /* Larger padding for full width look */
+                        padding: 20px 30px; 
                         cursor: pointer;
                         border-bottom: 1px solid var(--chat-border);
                         transition: 0.2s;
@@ -97,7 +97,7 @@
                     
                     /* Avatars */
                     .avatar {
-                        width: 55px; /* Larger avatar */
+                        width: 55px; 
                         height: 55px;
                         border-radius: 50%;
                         background-color: #ddd;
@@ -106,6 +106,13 @@
                         background-position: center;
                         position: relative;
                         flex-shrink: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 600;
+                        font-size: 20px;
+                        color: white;
+                        text-transform: uppercase;
                     }
                     .avatar.online::after {
                         content: ''; position: absolute; bottom: 2px; right: 2px;
@@ -278,7 +285,7 @@
 
                     .message-received {
                         align-self: flex-start;
-                        background-color: #fff; /* White background for received on gray area */
+                        background-color: #fff;
                         color: var(--chat-text-main);
                         border-bottom-left-radius: 2px;
                     }
@@ -389,22 +396,14 @@
                                 <div class="header-user">
                                     <div id="chatAvatar" class="avatar" style="width: 40px; height: 40px; margin-right: 15px;"></div>
                                     <div class="header-info">
-                                        <div id="chatName" class="header-name">Sarah Wilson</div>
+                                        <div id="chatName" class="header-name">User</div>
                                         <div id="chatStatus" class="header-status">Online</div>
                                     </div>
-                                </div>
-                                <div class="header-actions">
-                                    <button title="Voice Call">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 3C2 2.44772 2.44772 2 3 2H5.15287C5.64171 2 6.0589 2.35341 6.13358 2.83794L6.55625 5.58022C6.6155 5.96464 6.45266 6.35359 6.13123 6.5679L4.69324 7.52657C5.81232 9.54922 7.45078 11.1877 9.47343 12.3068L10.4321 10.8688C10.6464 10.5473 11.0354 10.3845 11.4198 10.4437L14.1621 10.8664C14.6466 10.9411 15 11.3583 15 11.8471V14C15 14.5523 14.5523 15 14 15C7.37258 15 2 9.62742 2 3Z" />
-                                        </svg>
-                                    </button>
                                 </div>
                             </div>
 
                             <div class="messages-content">
-                                
-                            </div>
+                                </div>
 
                             <div class="chat-input-area">
                                 <button class="attach-btn" title="Attach File">
@@ -448,12 +447,16 @@
     </div>
 
     <script>
-        const availableUsers = json($users ?? []);
+        // Safely serialize PHP data to JS
+        const availableUsers = {!! json_encode(isset($users) ? $users : []) !!};  //ini bukan error ges emg gini aga cacad
+        
         const startChatUrl = "{{ route('chat.start') }}";
         const messagesUrlTemplate = "{{ url('/chat') }}/:chatId/messages";
         const sendMessageUrlTemplate = "{{ url('/chat') }}/:chatId/message";
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const currentUserId = "{{Auth::User()->id}}";
+
+        // Current user ID as a JS primitive (number or null)
+        const currentUserId = {!! json_encode(optional(auth()->user())->id) !!};  //ini bukan error ges emg gini aga cacad
 
         function openChatFromElement(element) {
             const name = element.dataset.name;
@@ -469,9 +472,9 @@
             document.getElementById('chatWindowView').style.display = 'flex';
 
             document.getElementById('chatName').innerText = name;
-            document.getElementById('chatAvatar').style.backgroundImage = "url('" + imageUrl + "')";
             
             const avatar = document.getElementById('chatAvatar');
+            setupAvatar(avatar, imageUrl, name);
             const statusText = document.getElementById('chatStatus');
             
             if(isOnline) {
@@ -506,8 +509,7 @@
         }
 
         function closeChat() {
-            document.getElementById('chatWindowView').style.display = 'none';
-            document.getElementById('chatListView').style.display = 'flex';
+            window.location.href = "{{ route('chat') }}";
         }
 
         function toggleNewChat(show) {
@@ -545,7 +547,8 @@
                 avatarDiv.className = 'avatar';
                 avatarDiv.style.width = '32px';
                 avatarDiv.style.height = '32px';
-                avatarDiv.style.backgroundImage = "url('" + li.dataset.avatar + "')";
+                avatarDiv.style.fontSize = '14px';
+                setupAvatar(avatarDiv, li.dataset.avatar, li.dataset.name);
 
                 const nameSpan = document.createElement('span');
                 nameSpan.textContent = li.dataset.name;
@@ -639,7 +642,7 @@
                 const avatarDiv = document.createElement('div');
                 avatarDiv.className = 'avatar';
                 if (chat.is_online) { avatarDiv.classList.add('online'); }
-                avatarDiv.style.backgroundImage = "url('" + li.dataset.avatar + "')";
+                setupAvatar(avatarDiv, li.dataset.avatar, chat.name);
 
                 const userInfo = document.createElement('div');
                 userInfo.className = 'user-info';
@@ -651,7 +654,7 @@
                 nameSpan.textContent = chat.name;
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'msg-time';
-                timeSpan.textContent = chat.time || 'Just now';
+                timeSpan.textContent = formatTime(chat.time) || 'Just now';
                 headerRow.appendChild(nameSpan);
                 headerRow.appendChild(timeSpan);
 
@@ -662,6 +665,7 @@
                 userInfo.appendChild(headerRow);
                 userInfo.appendChild(lastMsg);
 
+                // Build the list item contents before adding to the DOM
                 li.appendChild(avatarDiv);
                 li.appendChild(userInfo);
 
@@ -689,8 +693,12 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.success) throw new Error(data.message || 'Failed to load messages');
-                    renderMessages(data.messages || []);
-                    return data.messages || [];
+                    const msgs = data.messages || [];
+                    renderMessages(msgs);
+                    // Update chat list preview to the latest message regardless of sender
+                    const last = msgs.length ? msgs[msgs.length - 1] : null;
+                    if (last) updateChatPreview(chatId, last.content, last.sent_at);
+                    return msgs;
                 })
                 .catch(err => {
                     if (messagesArea) {
@@ -705,8 +713,10 @@
             if (!messagesArea) return;
             messagesArea.innerHTML = '';
             messages.forEach(m => {
+                // Sender ID comparison now works correctly (Number vs Number)
+                const isMe = m.sender_id === currentUserId;
                 const bubble = document.createElement('div');
-                bubble.className = 'message-bubble ' + (m.sender_id === currentUserId ? 'message-sent' : 'message-received');
+                bubble.className = 'message-bubble ' + (isMe ? 'message-sent' : 'message-received');
                 bubble.innerHTML = `${escapeHtml(m.content)}<span class="msg-timestamp">${formatTime(m.sent_at)}</span>`;
                 messagesArea.appendChild(bubble);
             });
@@ -742,6 +752,8 @@
                     messagesArea.appendChild(bubble);
                     messagesArea.scrollTop = messagesArea.scrollHeight;
                 }
+                // Update chat list preview and time, move item to top
+                updateChatPreview(chatId, m.content, m.sent_at);
                 input.value = '';
             })
             .catch(err => alert(err.message || 'Unable to send message'));
@@ -755,21 +767,91 @@
 
         function formatTime(dateString) {
             if (!dateString) return '';
-            const d = new Date(dateString.replace(' ', 'T'));
-            if (isNaN(d.getTime())) return dateString;
+            let d;
+            try {
+                // Prefer ISO 8601 with timezone; fallback for "YYYY-MM-DD HH:mm:ss"
+                if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(dateString)) {
+                    // Treat backend naive timestamps as UTC to avoid local misinterpretation
+                    d = new Date(dateString.replace(' ', 'T') + 'Z');
+                } else {
+                    d = new Date(dateString);
+                }
+            } catch (_) {
+                return '';
+            }
+            if (isNaN(d.getTime())) return '';
             return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function updateChatPreview(chatId, content, sentAt) {
+            const li = document.querySelector(`.chat-item[data-chat-id="${chatId}"]`);
+            if (!li) return;
+            const lastEl = li.querySelector('.user-last-msg');
+            if (lastEl) lastEl.textContent = content || 'No messages';
+            const timeEl = li.querySelector('.msg-time');
+            if (timeEl) timeEl.textContent = formatTime(sentAt) || 'Just now';
+            const ul = li.parentElement;
+            if (ul) { li.remove(); ul.prepend(li); }
         }
 
         function assetPath(path) {
             return path.startsWith('http') ? path : `{{ asset('') }}${path}`;
         }
 
+        // Get initials from name (first letter of first two words)
+        function getInitials(name) {
+            if (!name) return '?';
+            const words = name.trim().split(/\s+/);
+            if (words.length === 1) return words[0].charAt(0).toUpperCase();
+            return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+        }
+
+        // Generate consistent color from name using hash
+        function getColorForName(name) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+                '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+                '#FF8551', '#6C5CE7', '#00B894', '#FDCB6E', '#E17055',
+                '#A29BFE', '#00CEC9', '#FF7675', '#74B9FF', '#55EFC4'
+            ];
+            let hash = 0;
+            for (let i = 0; i < (name || '').length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        // Setup avatar: show image or fallback to initials
+        function setupAvatar(avatarElement, imageUrl, name) {
+            const img = new Image();
+            img.onload = function() {
+                avatarElement.style.backgroundImage = `url('${imageUrl}')`;
+                avatarElement.textContent = '';
+            };
+            img.onerror = function() {
+                // Fallback to initials
+                avatarElement.style.backgroundImage = 'none';
+                avatarElement.style.backgroundColor = getColorForName(name);
+                avatarElement.textContent = getInitials(name);
+            };
+            // Check if URL is valid and not default placeholder
+            if (imageUrl && imageUrl.trim() && !imageUrl.includes('pravatar.cc')) {
+                img.src = imageUrl;
+            } else {
+                // No valid image, use initials immediately
+                avatarElement.style.backgroundImage = 'none';
+                avatarElement.style.backgroundColor = getColorForName(name);
+                avatarElement.textContent = getInitials(name);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.chat-item').forEach(function(item) {
                 const avatarUrl = item.dataset.avatar;
+                const name = item.dataset.name;
                 const avatarDiv = item.querySelector('.avatar');
-                if(avatarDiv && avatarUrl) {
-                    avatarDiv.style.backgroundImage = "url('" + avatarUrl + "')";
+                if(avatarDiv) {
+                    setupAvatar(avatarDiv, avatarUrl, name);
                 }
             });
 

@@ -23,6 +23,7 @@ class Messages extends Model
 
     protected $casts = [
         'sent_at' => 'datetime',
+        'read' => 'boolean',
     ];
 
     public function chat()
