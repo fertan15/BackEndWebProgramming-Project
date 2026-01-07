@@ -34,12 +34,12 @@
                         overflow: hidden;
                         border: 1px solid var(--chat-border);
                         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                        position: relative; /* Context for absolute positioning if needed */
+                        position: relative; 
                     }
 
                     /* --- VIEW 1: FULL WIDTH LIST (SIDEBAR) --- */
                     .chat-list-view {
-                        width: 100%; /* Full width */
+                        width: 100%;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
@@ -88,7 +88,7 @@
                     .chat-item {
                         display: flex;
                         align-items: center;
-                        padding: 20px 30px; /* Larger padding for full width look */
+                        padding: 20px 30px; 
                         cursor: pointer;
                         border-bottom: 1px solid var(--chat-border);
                         transition: 0.2s;
@@ -97,7 +97,7 @@
                     
                     /* Avatars */
                     .avatar {
-                        width: 55px; /* Larger avatar */
+                        width: 55px; 
                         height: 55px;
                         border-radius: 50%;
                         background-color: #ddd;
@@ -278,7 +278,7 @@
 
                     .message-received {
                         align-self: flex-start;
-                        background-color: #fff; /* White background for received on gray area */
+                        background-color: #fff;
                         color: var(--chat-text-main);
                         border-bottom-left-radius: 2px;
                     }
@@ -389,7 +389,7 @@
                                 <div class="header-user">
                                     <div id="chatAvatar" class="avatar" style="width: 40px; height: 40px; margin-right: 15px;"></div>
                                     <div class="header-info">
-                                        <div id="chatName" class="header-name">Sarah Wilson</div>
+                                        <div id="chatName" class="header-name">User</div>
                                         <div id="chatStatus" class="header-status">Online</div>
                                     </div>
                                 </div>
@@ -403,8 +403,7 @@
                             </div>
 
                             <div class="messages-content">
-                                
-                            </div>
+                                </div>
 
                             <div class="chat-input-area">
                                 <button class="attach-btn" title="Attach File">
@@ -448,12 +447,16 @@
     </div>
 
     <script>
-        const availableUsers = json($users ?? []);
+        // Safely serialize PHP data to JS
+        const availableUsers = {!! json_encode(isset($users) ? $users : []) !!};  //ini bukan error ges emg gini aga cacad
+        
         const startChatUrl = "{{ route('chat.start') }}";
         const messagesUrlTemplate = "{{ url('/chat') }}/:chatId/messages";
         const sendMessageUrlTemplate = "{{ url('/chat') }}/:chatId/message";
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const currentUserId = "{{Auth::User()->id}}";
+
+        // Current user ID as a JS primitive (number or null)
+        const currentUserId = {!! json_encode(optional(auth()->user())->id) !!};  //ini bukan error ges emg gini aga cacad
 
         function openChatFromElement(element) {
             const name = element.dataset.name;
@@ -662,9 +665,6 @@
                 userInfo.appendChild(headerRow);
                 userInfo.appendChild(lastMsg);
 
-                li.appendChild(avatarDiv);
-                li.appendChild(userInfo);
-
                 list.prepend(li);
 
                 openChat(chat.name, li.dataset.avatar, chat.is_online, chat.chat_id);
@@ -705,8 +705,10 @@
             if (!messagesArea) return;
             messagesArea.innerHTML = '';
             messages.forEach(m => {
+                // Sender ID comparison now works correctly (Number vs Number)
+                const isMe = m.sender_id === currentUserId;
                 const bubble = document.createElement('div');
-                bubble.className = 'message-bubble ' + (m.sender_id === currentUserId ? 'message-sent' : 'message-received');
+                bubble.className = 'message-bubble ' + (isMe ? 'message-sent' : 'message-received');
                 bubble.innerHTML = `${escapeHtml(m.content)}<span class="msg-timestamp">${formatTime(m.sent_at)}</span>`;
                 messagesArea.appendChild(bubble);
             });

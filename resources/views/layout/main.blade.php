@@ -102,6 +102,7 @@
             },
         ];
 
+        if (document.getElementById("map") && window.jsVectorMap) {
         var jvm = new jsVectorMap({
             map: "world_merc",
             selector: "#map",
@@ -143,20 +144,25 @@
                 },
             },
         });
+        }
         // ====== calendar activation
         document.addEventListener("DOMContentLoaded", function() {
             var calendarMiniEl = document.getElementById("calendar-mini");
-            var calendarMini = new FullCalendar.Calendar(calendarMiniEl, {
-                initialView: "dayGridMonth",
-                headerToolbar: {
-                    end: "today prev,next",
-                },
-            });
-            calendarMini.render();
+            if (calendarMiniEl && window.FullCalendar) {
+                var calendarMini = new FullCalendar.Calendar(calendarMiniEl, {
+                    initialView: "dayGridMonth",
+                    headerToolbar: {
+                        end: "today prev,next",
+                    },
+                });
+                calendarMini.render();
+            }
         });
 
         // =========== chart one start
-        const ctx1 = document.getElementById("Chart1").getContext("2d");
+        const _c1 = document.getElementById("Chart1");
+        if (_c1 && window.Chart) {
+        const ctx1 = _c1.getContext("2d");
         const chart1 = new Chart(ctx1, {
             type: "line",
             data: {
@@ -267,10 +273,13 @@
                 },
             },
         });
+        }
         // =========== chart one end
 
         // =========== chart two start
-        const ctx2 = document.getElementById("Chart2").getContext("2d");
+        const _c2 = document.getElementById("Chart2");
+        if (_c2 && window.Chart) {
+        const ctx2 = _c2.getContext("2d");
         const chart2 = new Chart(ctx2, {
             type: "bar",
             data: {
@@ -388,10 +397,13 @@
                 },
             },
         });
+        }
         // =========== chart two end
 
         // =========== chart three start
-        const ctx3 = document.getElementById("Chart3").getContext("2d");
+        const _c3 = document.getElementById("Chart3");
+        if (_c3 && window.Chart) {
+        const ctx3 = _c3.getContext("2d");
         const chart3 = new Chart(ctx3, {
             type: "line",
             data: {
@@ -531,10 +543,13 @@
                 },
             },
         });
+        }
         // =========== chart three end
 
         // ================== chart four start
-        const ctx4 = document.getElementById("Chart4").getContext("2d");
+        const _c4 = document.getElementById("Chart4");
+        if (_c4 && window.Chart) {
+        const ctx4 = _c4.getContext("2d");
         const chart4 = new Chart(ctx4, {
             type: "bar",
             data: {
@@ -623,6 +638,7 @@
                 },
             },
         });
+        }
         // =========== chart four end
     </script>
 </body>
