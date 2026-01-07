@@ -49,13 +49,6 @@
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Total Cards</label>
-                        <input type="number" min="1" name="total_cards" class="form-control" value="{{ old('total_cards') }}" placeholder="e.g. 102">
-                        @error('total_cards')
-                            <small class="text-danger">{{ $message }}</small>
-                        @enderror
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label">Set Image</label>
                         <input type="file" name="image" class="form-control" accept="image/*" required>
                         <small class="text-muted">Max 2MB. Stored in public/images/card_set.</small>
