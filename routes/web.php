@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TopUpController;
 use App\Http\Controllers\CardController;  
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\chatController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Otp;
 
 /*
@@ -95,7 +97,14 @@ Route::get('/chat/{chat}/messages', [chatController::class, 'messages'])->name('
 Route::post('/chat/{chat}/message', [chatController::class, 'sendMessage'])->name('chat.message.send');
 
 
+//route buat checkout 
+Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
+Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->name('purchase.process');
 
+//route top up 
+Route::get('/topup', [TopUpController::class, 'show'])->name('topup.show');
+Route::post('/topup/snap', [TopUpController::class, 'getSnapToken'])->name('topup.snap');
+Route::post('/midtrans-notification', [TopUpController::class, 'handleNotification']);
 
 // Admin area
 Route::prefix('admin')->name('admin.')->group(function () {

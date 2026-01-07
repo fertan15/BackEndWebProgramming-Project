@@ -100,6 +100,17 @@
                     <span class="text">Chat</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('topup.show') }}">
+                    <span class="icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18V6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V18ZM5 18C5 18.5523 5.44772 19 6 19H18C18.5523 19 19 18.5523 19 18V13H17C15.8954 13 15 12.1046 15 11C15 9.89543 15.8954 9 17 9H19V6C19 5.44772 18.5523 5 18 5H6C5.44772 5 5 5.44772 5 6V18ZM19 11V11H17C17 11.5523 17.4477 12 18 12C18.5523 12 19 11.5523 19 11Z"/>
+                        </svg>
+                    </span>                    
+                    <span class="text">Top Up</span>
+                </a>
+            </li>
+
 
             
             @endauth

@@ -48,9 +48,13 @@
 
                         <!-- Action Buttons -->
                         <div class="d-grid gap-2">
-                            <button class="btn btn-success btn-lg" disabled>
-                                <i class="lni lni-cart"></i> Buy Now (Coming Soon)
-                            </button>
+                            <form action="{{ route('checkout.show') }}" method="GET">
+                                <input type="hidden" name="card_id" value="{{ $card->id }}">
+                                
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="lni lni-cart"></i> Buy Now
+                                </button>
+                            </form>
                             
                             <form action="{{ route('wishlist.toggle', $card->id) }}" method="POST" class="wishlist-toggle-form">
                                 @csrf
