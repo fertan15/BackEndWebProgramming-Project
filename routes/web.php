@@ -104,6 +104,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/requests', [AdminController::class, 'requests'])->name('requests');
     Route::post('/requests/{id}/approve', [AdminController::class, 'approveRequest'])->name('requests.approve');
     Route::post('/requests/{id}/reject', [AdminController::class, 'rejectRequest'])->name('requests.reject');
+    Route::get('/card-sets/create', [AdminController::class, 'createCardSetForm'])->name('card_sets.create');
+    Route::post('/card-sets', [AdminController::class, 'storeCardSet'])->name('card_sets.store');
     Route::get('/cards/create', [AdminController::class, 'createCardForm'])->name('cards.create');
     Route::post('/cards', [AdminController::class, 'storeCard'])->name('cards.store');
 });

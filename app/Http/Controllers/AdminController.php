@@ -43,6 +43,49 @@ class AdminController extends Controller
         ]);
     }
 
+    public function createCardSetForm()
+    {
+        return view('admin.card_sets_create');
+    }
+
+    public function storeCardSet(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:card_sets,name',
+            'release_date' => 'nullable|date',
+            'description' => 'nullable|string|max:1000',
+            'total_cards' => 'required|integer|min:1',
+            'image' => 'required|image|max:2048',
+        ]);
+
+        // Handle image upload
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = 'set_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $destination = public_path('images/card_set');
+
+            if (!is_dir($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            $image->move($destination, $filename);
+            $imagePath = 'images/card_set/' . $filename;
+        }
+
+        CardSets::create([
+            'name' => $validated['name'],
+            'release_date' => $validated['release_date'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'total_cards' => $validated['total_cards'] ?? 0,
+            'image_url' => $imagePath,
+        ]);
+
+        return redirect()
+            ->route('admin.card_sets.create')
+            ->with('success', 'Card set created successfully.');
+    }
+
     public function createCardForm()
     {
         $cardSets = CardSets::orderBy('name')->get();
