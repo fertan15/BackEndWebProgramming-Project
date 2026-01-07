@@ -1,4 +1,18 @@
 <!-- ======== sidebar-nav start =========== -->
+@php
+    $notificationUnread = auth()->check()
+        ? \App\Models\Notification::where('user_id', auth()->id())->unread()->count()
+        : 0;
+    $chatUnread = auth()->check()
+        ? \App\Models\Messages::where('read', 0)
+            ->where('sender_id', '!=', auth()->id())
+            ->whereHas('chat', function($q) {
+                $q->where('user1_id', auth()->id())->orWhere('user2_id', auth()->id());
+            })
+            ->count()
+        : 0;
+@endphp
+
 <aside class="sidebar-nav-wrapper">
     <div class="navbar-logo">
         <a href="{{ route('home') }}">
@@ -97,7 +111,12 @@
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.58172 2 2 5.13401 2 9C2 11.0879 3.06471 12.9604 4.7627 14.2696C4.37842 15.6014 3.54332 16.7875 2.5676 17.7307C2.32075 17.9695 2.30408 18.3582 2.53043 18.617C2.75679 18.8757 3.1404 18.9081 3.4053 18.6907C5.32347 17.1166 6.63763 15.6544 7.50502 14.9055C8.29792 15.0956 9.13381 15.1987 10 15.1987C14.4183 15.1987 18 12.0647 18 8.19873C18 4.33276 14.4183 2 10 2Z" />
                         </svg>
                     </span>                    
-                    <span class="text">Chat</span>
+                    <span class="text d-flex align-items-center gap-2">
+                        <span>Chat</span>
+                        @if($chatUnread > 0)
+                            <span class="badge bg-danger" style="font-size: 11px;">{{ $chatUnread }}</span>
+                        @endif
+                    </span>
                 </a>
             </li>
 
@@ -122,7 +141,12 @@
                                 d="M7.48901 17.1925C8.10004 17.8918 8.99841 18.3335 10 18.3335C11.0016 18.3335 11.9 17.8918 12.511 17.1925C10.8482 17.4634 9.15183 17.4634 7.48901 17.1925Z" />
                         </svg>
                     </span>
-                    <span class="text">Notifications</span>
+                    <span class="text d-flex align-items-center gap-2">
+                        <span>Notifications</span>
+                        @if($notificationUnread > 0)
+                            <span class="badge bg-danger" style="font-size: 11px;">{{ $notificationUnread }}</span>
+                        @endif
+                    </span>
                 </a>
             </li>
         </ul>

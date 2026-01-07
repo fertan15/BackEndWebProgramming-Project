@@ -17,11 +17,13 @@ class Messages extends Model
         'chat_id',
         'sender_id',
         'content',
-        'sent_at'
+        'sent_at',
+        'read'
     ];
 
     protected $casts = [
         'sent_at' => 'datetime',
+        'read' => 'boolean',
     ];
 
     public function chat()

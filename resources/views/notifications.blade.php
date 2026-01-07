@@ -78,7 +78,7 @@
                                                 <!-- Actions -->
                                                 @auth
                                                     <div class="d-flex gap-2 mt-2">
-                                                        @if(!$notification->is_read)
+                                                        @if(!$notification->is_read && $notification->user_id === auth()->id())
                                                             <form action="{{ route('notifications.markRead', $notification->id) }}" method="POST" style="display: inline;">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-sm" style="background: #e0f2fe; color: #0284c7; border: none; border-radius: 6px; padding: 5px 12px; font-size: 13px; font-weight: 500;">
@@ -87,7 +87,7 @@
                                                             </form>
                                                         @endif
 
-                                                        @if(session('is_admin'))
+                                                        @if(session('is_admin') || $notification->user_id === auth()->id())
                                                             <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" style="display: inline;">
                                                                 @csrf
                                                                 @method('DELETE')

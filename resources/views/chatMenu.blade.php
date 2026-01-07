@@ -400,13 +400,6 @@
                                         <div id="chatStatus" class="header-status">Online</div>
                                     </div>
                                 </div>
-                                <div class="header-actions">
-                                    <button title="Voice Call">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M2 3C2 2.44772 2.44772 2 3 2H5.15287C5.64171 2 6.0589 2.35341 6.13358 2.83794L6.55625 5.58022C6.6155 5.96464 6.45266 6.35359 6.13123 6.5679L4.69324 7.52657C5.81232 9.54922 7.45078 11.1877 9.47343 12.3068L10.4321 10.8688C10.6464 10.5473 11.0354 10.3845 11.4198 10.4437L14.1621 10.8664C14.6466 10.9411 15 11.3583 15 11.8471V14C15 14.5523 14.5523 15 14 15C7.37258 15 2 9.62742 2 3Z" />
-                                        </svg>
-                                    </button>
-                                </div>
                             </div>
 
                             <div class="messages-content">
@@ -516,8 +509,7 @@
         }
 
         function closeChat() {
-            document.getElementById('chatWindowView').style.display = 'none';
-            document.getElementById('chatListView').style.display = 'flex';
+            window.location.href = "{{ route('chat') }}";
         }
 
         function toggleNewChat(show) {
@@ -672,6 +664,10 @@
 
                 userInfo.appendChild(headerRow);
                 userInfo.appendChild(lastMsg);
+
+                // Build the list item contents before adding to the DOM
+                li.appendChild(avatarDiv);
+                li.appendChild(userInfo);
 
                 list.prepend(li);
 

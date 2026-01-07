@@ -187,6 +187,7 @@ CREATE TABLE `messages` (
   `sender_id` int(11) NOT NULL,
   `content` text NOT NULL,
   `sent_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `read` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `sender_id` (`sender_id`),
   KEY `idx_messages_chat` (`chat_id`,`sent_at`),

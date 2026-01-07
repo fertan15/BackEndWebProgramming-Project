@@ -36,8 +36,10 @@ class chatController extends Controller
                                    ->orderBy('sent_at', 'desc')
                                    ->first();
             
-            // Note: 'read' column tracking is not implemented in database
-            $unreadCount = 0;
+            $unreadCount = Messages::where('chat_id', $chat->id)
+                                   ->where('sender_id', '!=', $currentUserId)
+                                   ->where('read', 0)
+                                   ->count();
             
             $chatsList[] = [
                 'name' => $otherPerson->name ?? 'Unknown User',
@@ -109,6 +111,7 @@ class chatController extends Controller
                 'sender_id' => $currentUserId,
                 'content' => $messageText,
                 'sent_at' => Carbon::now(),
+                'read' => 0,
             ]);
         }
 
@@ -140,8 +143,11 @@ class chatController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Note: Message read status tracking is not implemented in database
-        
+        Messages::where('chat_id', $chat->id)
+            ->where('sender_id', '!=', $currentUserId)
+            ->where('read', 0)
+            ->update(['read' => 1]);
+
         $messages = Messages::where('chat_id', $chat->id)
                             ->orderBy('sent_at', 'asc')
                             ->get()
@@ -150,6 +156,7 @@ class chatController extends Controller
                                     'id' => $m->id,
                                     'sender_id' => $m->sender_id,
                                     'content' => $m->content,
+                                    'read' => $m->read,
                                     // ISO 8601 to include timezone info for correct client parsing
                                     'sent_at' => $m->sent_at ? $m->sent_at->toIso8601String() : null,
                                 ];
@@ -174,6 +181,7 @@ class chatController extends Controller
             'sender_id' => $currentUserId,
             'content' => $request->input('content'),
             'sent_at' => Carbon::now(),
+            'read' => 0,
         ]);
 
         return response()->json([
@@ -182,6 +190,7 @@ class chatController extends Controller
                 'id' => $message->id,
                 'sender_id' => $message->sender_id,
                 'content' => $message->content,
+                'read' => $message->read,
                 // ISO 8601 for consistency
                 'sent_at' => $message->sent_at->toIso8601String(),
             ],
