@@ -106,6 +106,13 @@
                         background-position: center;
                         position: relative;
                         flex-shrink: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 600;
+                        font-size: 20px;
+                        color: white;
+                        text-transform: uppercase;
                     }
                     .avatar.online::after {
                         content: ''; position: absolute; bottom: 2px; right: 2px;
@@ -472,9 +479,9 @@
             document.getElementById('chatWindowView').style.display = 'flex';
 
             document.getElementById('chatName').innerText = name;
-            document.getElementById('chatAvatar').style.backgroundImage = "url('" + imageUrl + "')";
             
             const avatar = document.getElementById('chatAvatar');
+            setupAvatar(avatar, imageUrl, name);
             const statusText = document.getElementById('chatStatus');
             
             if(isOnline) {
@@ -548,7 +555,8 @@
                 avatarDiv.className = 'avatar';
                 avatarDiv.style.width = '32px';
                 avatarDiv.style.height = '32px';
-                avatarDiv.style.backgroundImage = "url('" + li.dataset.avatar + "')";
+                avatarDiv.style.fontSize = '14px';
+                setupAvatar(avatarDiv, li.dataset.avatar, li.dataset.name);
 
                 const nameSpan = document.createElement('span');
                 nameSpan.textContent = li.dataset.name;
@@ -642,7 +650,7 @@
                 const avatarDiv = document.createElement('div');
                 avatarDiv.className = 'avatar';
                 if (chat.is_online) { avatarDiv.classList.add('online'); }
-                avatarDiv.style.backgroundImage = "url('" + li.dataset.avatar + "')";
+                setupAvatar(avatarDiv, li.dataset.avatar, chat.name);
 
                 const userInfo = document.createElement('div');
                 userInfo.className = 'user-info';
@@ -654,7 +662,7 @@
                 nameSpan.textContent = chat.name;
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'msg-time';
-                timeSpan.textContent = chat.time || 'Just now';
+                timeSpan.textContent = formatTime(chat.time) || 'Just now';
                 headerRow.appendChild(nameSpan);
                 headerRow.appendChild(timeSpan);
 
@@ -689,8 +697,12 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.success) throw new Error(data.message || 'Failed to load messages');
-                    renderMessages(data.messages || []);
-                    return data.messages || [];
+                    const msgs = data.messages || [];
+                    renderMessages(msgs);
+                    // Update chat list preview to the latest message regardless of sender
+                    const last = msgs.length ? msgs[msgs.length - 1] : null;
+                    if (last) updateChatPreview(chatId, last.content, last.sent_at);
+                    return msgs;
                 })
                 .catch(err => {
                     if (messagesArea) {
@@ -744,6 +756,8 @@
                     messagesArea.appendChild(bubble);
                     messagesArea.scrollTop = messagesArea.scrollHeight;
                 }
+                // Update chat list preview and time, move item to top
+                updateChatPreview(chatId, m.content, m.sent_at);
                 input.value = '';
             })
             .catch(err => alert(err.message || 'Unable to send message'));
@@ -757,21 +771,91 @@
 
         function formatTime(dateString) {
             if (!dateString) return '';
-            const d = new Date(dateString.replace(' ', 'T'));
-            if (isNaN(d.getTime())) return dateString;
+            let d;
+            try {
+                // Prefer ISO 8601 with timezone; fallback for "YYYY-MM-DD HH:mm:ss"
+                if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(dateString)) {
+                    // Treat backend naive timestamps as UTC to avoid local misinterpretation
+                    d = new Date(dateString.replace(' ', 'T') + 'Z');
+                } else {
+                    d = new Date(dateString);
+                }
+            } catch (_) {
+                return '';
+            }
+            if (isNaN(d.getTime())) return '';
             return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function updateChatPreview(chatId, content, sentAt) {
+            const li = document.querySelector(`.chat-item[data-chat-id="${chatId}"]`);
+            if (!li) return;
+            const lastEl = li.querySelector('.user-last-msg');
+            if (lastEl) lastEl.textContent = content || 'No messages';
+            const timeEl = li.querySelector('.msg-time');
+            if (timeEl) timeEl.textContent = formatTime(sentAt) || 'Just now';
+            const ul = li.parentElement;
+            if (ul) { li.remove(); ul.prepend(li); }
         }
 
         function assetPath(path) {
             return path.startsWith('http') ? path : `{{ asset('') }}${path}`;
         }
 
+        // Get initials from name (first letter of first two words)
+        function getInitials(name) {
+            if (!name) return '?';
+            const words = name.trim().split(/\s+/);
+            if (words.length === 1) return words[0].charAt(0).toUpperCase();
+            return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+        }
+
+        // Generate consistent color from name using hash
+        function getColorForName(name) {
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+                '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+                '#FF8551', '#6C5CE7', '#00B894', '#FDCB6E', '#E17055',
+                '#A29BFE', '#00CEC9', '#FF7675', '#74B9FF', '#55EFC4'
+            ];
+            let hash = 0;
+            for (let i = 0; i < (name || '').length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        // Setup avatar: show image or fallback to initials
+        function setupAvatar(avatarElement, imageUrl, name) {
+            const img = new Image();
+            img.onload = function() {
+                avatarElement.style.backgroundImage = `url('${imageUrl}')`;
+                avatarElement.textContent = '';
+            };
+            img.onerror = function() {
+                // Fallback to initials
+                avatarElement.style.backgroundImage = 'none';
+                avatarElement.style.backgroundColor = getColorForName(name);
+                avatarElement.textContent = getInitials(name);
+            };
+            // Check if URL is valid and not default placeholder
+            if (imageUrl && imageUrl.trim() && !imageUrl.includes('pravatar.cc')) {
+                img.src = imageUrl;
+            } else {
+                // No valid image, use initials immediately
+                avatarElement.style.backgroundImage = 'none';
+                avatarElement.style.backgroundColor = getColorForName(name);
+                avatarElement.textContent = getInitials(name);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.chat-item').forEach(function(item) {
                 const avatarUrl = item.dataset.avatar;
+                const name = item.dataset.name;
                 const avatarDiv = item.querySelector('.avatar');
-                if(avatarDiv && avatarUrl) {
-                    avatarDiv.style.backgroundImage = "url('" + avatarUrl + "')";
+                if(avatarDiv) {
+                    setupAvatar(avatarDiv, avatarUrl, name);
                 }
             });
 

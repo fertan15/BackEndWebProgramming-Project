@@ -1,3 +1,25 @@
+<style>
+    .profile-info .image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ddd;
+        font-weight: 600;
+        font-size: 16px;
+        color: white;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+    .profile-info .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
 <header class="header">
     <div class="container-fluid">
         <div class="row">
@@ -57,8 +79,7 @@
                                 
                             <div class="profile-info">
                                 <div class="info">
-                                    <div class="image">
-                                        <img src="assets/images/profile/profile-image.png" alt="" />
+                                    <div class="image" id="topMenuAvatar" data-name="{{ Auth::user()->name }}" data-image="{{ Auth::user()->identity_image_url ?? '' }}">
                                     </div>
                                     <div>
                                         <h6 class="fw-500" style="text-align: right;">{{ Auth::user()->name }}</h6>
@@ -112,8 +133,7 @@
 
                                     <div class="profile-info text-left">
                                         <div class="info">
-                                            <div class="image">
-                                                <img src="assets/images/profile/profile-image.png" alt="" />
+                                            <div class="image" id="guestAvatar" data-name="Guest" data-image="">
                                             </div>
                                             <div>
                                                 <h6 class="fw-500" style="text-align: right;">Log In</h6>
@@ -130,3 +150,59 @@
     </div>
 </header>
 <!-- ========== header end ========== -->
+<script>
+    // Get initials from name
+    function getInitials(name) {
+        if (!name) return '?';
+        const words = name.trim().split(/\s+/);
+        if (words.length === 1) return words[0].charAt(0).toUpperCase();
+        return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+    }
+
+    // Generate consistent color from name
+    function getColorForName(name) {
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
+            '#FF8551', '#6C5CE7', '#00B894', '#FDCB6E', '#E17055',
+            '#A29BFE', '#00CEC9', '#FF7675', '#74B9FF', '#55EFC4'
+        ];
+        let hash = 0;
+        for (let i = 0; i < (name || '').length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return colors[Math.abs(hash) % colors.length];
+    }
+
+    // Setup avatar
+    function setupTopMenuAvatar(element) {
+        const imageUrl = element.dataset.image;
+        const name = element.dataset.name;
+        
+        if (imageUrl && imageUrl.trim()) {
+            const img = new Image();
+            img.onload = function() {
+                element.innerHTML = `<img src="${imageUrl}" alt="${name}" />`;
+            };
+            img.onerror = function() {
+                // Fallback to initials
+                element.style.backgroundColor = getColorForName(name);
+                element.textContent = getInitials(name);
+            };
+            img.src = imageUrl;
+        } else {
+            // No image, use initials
+            element.style.backgroundColor = getColorForName(name);
+            element.textContent = getInitials(name);
+        }
+    }
+
+    // Initialize avatars on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const topMenuAvatar = document.getElementById('topMenuAvatar');
+        if (topMenuAvatar) setupTopMenuAvatar(topMenuAvatar);
+        
+        const guestAvatar = document.getElementById('guestAvatar');
+        if (guestAvatar) setupTopMenuAvatar(guestAvatar);
+    });
+</script>
