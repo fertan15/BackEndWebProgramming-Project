@@ -85,13 +85,13 @@ class AuthController extends Controller
     public function storeRegisterStep1(Request $request)
     {
         // Validate input
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'phone' => 'required',
-            'fullname' => 'required|string',
-            'username' => 'required|string',
-            'password' => 'required|min:8'
-        ]);
+        // $validated = $request->validate([
+        //     'email' => 'required|email',
+        //     'phone' => 'required',
+        //     'fullname' => 'required|string',
+        //     'username' => 'required|string',
+        //     'password' => 'required|min:8|confirmed'
+        // ]);
 
         // Check if email already exists with 'pending' or 'verified' identity_status
         $existingUser = Users::where('email', $request->input('email'))
@@ -102,23 +102,39 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'This email is already registered. Please use a different email.'])->withInput();
         }
 
-        // Check if username is already taken
-        $existingUsername = Users::where('username', $request->input('username'))->first();
-        if ($existingUsername) {
-            return back()->withErrors(['username' => 'This username is already taken. Please choose a different username.'])->withInput();
+        // Check if email exists with 'unverified' status
+        $unverifiedUser = Users::where('email', $request->input('email'))
+            ->where('identity_status', 'unverified')
+            ->first();
+
+        if ($unverifiedUser) {
+            // Check if password matches
+            if (Hash::check($request->input('password'), $unverifiedUser->password_hash)) {
+                // Password matches - allow them to continue registration
+                $user = $unverifiedUser;
+            } else {
+                // Password doesn't match - email is already in use
+                return back()->withErrors(['email' => 'This email has already been used. Please use a different email.'])->withInput();
+            }
+        } else {
+            // Check if username is already taken
+            $existingUsername = Users::where('username', $request->input('username'))->first();
+            if ($existingUsername) {
+                return back()->withErrors(['username' => 'This username is already taken. Please choose a different username.'])->withInput();
+            }
+
+            // Create new user in DB with unverified status
+            $user = Users::create([
+                'username' => $request->input('username'),
+                'email' => $request->input('email'),
+                'phone_number' => $request->input('phone'),
+                'name' => $request->input('fullname'),
+                'password_hash' => Hash::make($request->input('password')),
+                'account_status' => 'verify', // Mark as needing verification
+                'identity_status' => 'unverified' // Initial identity status
+            ]);
         }
 
-        // Create temporary user in DB with unverified status (not fully verified yet)
-        $user = Users::create([
-            'username' => $request->input('username'),
-            'email' => $request->input('email'),
-            'phone_number' => $request->input('phone'),
-            'name' => $request->input('fullname'),
-            'password_hash' => Hash::make($request->input('password')),
-            'account_status' => 'verify', // Mark as needing verification
-            'identity_status' => 'unverified' // Initial identity status
-        ]);
-        dump("User created with ID: " . $user->id);
         // Store user ID in session for the next step
         $request->session()->put('register.user_id', $user->id);
         $request->session()->put('register.phone', $user->phone_number);
