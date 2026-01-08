@@ -143,3 +143,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/cards/create', [AdminController::class, 'createCardForm'])->name('cards.create');
     Route::post('/cards', [AdminController::class, 'storeCard'])->name('cards.store');
 });
+
+// ajax buat refresh listings di home
+Route::get('/listings/refresh', [App\Http\Controllers\HomeController::class, 'refreshListings'])->name('listings.refresh');

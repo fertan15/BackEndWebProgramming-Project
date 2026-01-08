@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Listings;
 use App\Models\Wishlists;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,9 +17,26 @@ class HomeController extends Controller
         $user_id = $request->session()->get('user_id');
         $user_name = $request->session()->get('user_name', 'User');
 
-        return view('home', compact('user_id', 'user_name'));
+        $latestListings = Listings::with(['card', 'seller'])
+            ->where('is_active', true)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('home', compact('latestListings', 'user_id', 'user_name'));
+
     }
 
+    //buat di home, ajax refresh listings
+    public function refreshListings()
+    {
+        $latestListings = Listings::with(['card', 'seller'])
+                            ->latest()
+                            ->take(4)
+                            ->get();
+
+        return view('partials.listing_cards', ['listings' => $latestListings])->render();
+    }
     /**
      * Logout the user.
      */
@@ -147,6 +165,8 @@ class HomeController extends Controller
             return redirect()->back()->with('success', 'Added to wishlist');
         }
     }
+
+
 
     /**
      * Show settings page.

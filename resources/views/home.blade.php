@@ -43,9 +43,46 @@
             </div>
         </div>
     </section>
+
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="d-flex justify-content-between align-items-end mb-5">
+                <div>
+                    <span class="text-indigo-600 font-bold tracking-wider text-xs uppercase mb-2 d-block">Marketplace</span>
+                    <h2 class="text-3xl font-extrabold text-gray-900">
+                        Fresh Pulls & Listings
+                    </h2>
+                </div>
+                <a href="{{ route('cards') }}" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm">
+                    View All &rarr;
+                </a>
+            </div>
+
+            {{-- This container will be updated by AJAX --}}
+            <div id="latest-listings-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @include('partials.listing_cards', ['listings' => $latestListings])
+            </div>
+        </div>
+    </section>
+
 @endsection
 
 <style>
+
+    .holo-sheen {
+    background: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.4) 45%,
+        rgba(100, 200, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.4) 55%,
+        transparent 80%
+    );
+    z-index: 10;
+    filter: brightness(1.2) contrast(1.1);
+    mix-blend-mode: overlay;
+    }
+
     /* ====== HERO XL ====== */
     .pokemon-jumbo-xl {
         position: relative;
@@ -311,3 +348,19 @@
         }
     }
 </style>
+
+<script>
+    
+    // buat ngerefresh tiap 30 detik
+    setInterval(() => {
+        fetch("{{ route('listings.refresh') }}")
+            .then(res => res.text())
+            .then(html => {
+                const container = document.getElementById('latest-listings-container');
+                if (container) {
+                    container.innerHTML = html;
+                }
+            })
+            .catch(err => console.error('Refresh failed:', err));
+    }, 30000); 
+</script>
