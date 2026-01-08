@@ -53,25 +53,6 @@
                             </button>
                         </div>
                         <!-- wishlist end -->
-                        <!-- cart start -->
-                        <div class="header-cart-box ml-15 d-none d-md-flex">
-                            <button class="dropdown-toggle" type="button" id="cart"
-                                data-bs-toggle="dropdown" aria-expanded="false" onclick="location.href='/login'">
-                                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M2.75 3.66667H3.93933C4.57867 3.66667 5.108 4.132 5.17967 4.76675L5.85417 10.5833M5.85417 10.5833L6.47608 16.0738C6.55342 16.7455 7.11567 17.2542 7.79117 17.2542H16.9827C17.6582 17.2542 18.2205 16.7455 18.2978 16.0738L19.25 7.33333H5.85417Z"
-                                        stroke="" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="" />
-                                    <path
-                                        d="M9.16667 20.1667C9.16667 20.9031 9.76363 21.5 10.5 21.5C11.2364 21.5 11.8333 20.9031 11.8333 20.1667C11.8333 19.4302 11.2364 18.8333 10.5 18.8333C9.76363 18.8333 9.16667 19.4302 9.16667 20.1667Z"
-                                        fill="" />
-                                    <path
-                                        d="M15.5833 20.1667C15.5833 20.9031 16.1803 21.5 16.9167 21.5C17.653 21.5 18.25 20.9031 18.25 20.1667C18.25 19.4302 17.653 18.8333 16.9167 18.8333C16.1803 18.8333 15.5833 19.4302 15.5833 20.1667Z"
-                                        fill="" />
-                                </svg>
-                                <span></span>
-                            </button>
-                        <!-- cart end -->
                         <!-- profile start -->
                         <div class="profile-box ml-15">
                             <button class="dropdown-toggle bg-transparent border-0" type="button" id="profile"

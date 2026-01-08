@@ -15,7 +15,7 @@ class WalletTransactions extends Model
 
     protected $fillable = [
         'user_id',
-        'reference_order_id',
+        'reference_order_item_id',
         'amount',
         'transaction_type',
         'description',
@@ -32,8 +32,8 @@ class WalletTransactions extends Model
         return $this->belongsTo(Users::class, 'user_id');
     }
 
-    public function order()
+    public function orderItem()
     {
-        return $this->belongsTo(Orders::class, 'reference_order_id');
+        return $this->belongsTo(OrderItems::class, 'reference_order_item_id');
     }
 }

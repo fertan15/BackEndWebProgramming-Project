@@ -164,9 +164,14 @@
                                                     <td>{{ $listing->quantity }}</td>
                                                     <td>
                                                         @if ($listing->seller_id == session()->get('user_id'))
-                                                            {{-- memang dikosongkan --}}
+                                                            <form method="POST" action="/cancel-listing/{{ $listing->id }}" style="display: inline;">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this listing?')">
+                                                                    <i class="lni lni-trash"></i> Cancel
+                                                                </button>
+                                                            </form>
                                                         @else
-                                                            <button class="btn btn-sm btn-primary">
+                                                            <button class="btn btn-sm btn-primary buy-btn" data-listing-id="{{ $listing->id }}" data-card-name="{{ $card->name }}" data-price="{{ $listing->price }}" data-quantity="{{ $listing->quantity }}">
                                                                 Buy
                                                             </button>
                                                         @endif
@@ -196,7 +201,8 @@
                                         <thead>
                                             <tr>
                                                 <th>Seller</th>
-                                                <th>Listed On</th>
+                                                <th>Buyer</th>
+                                                <th>Purchased On</th>
                                                 <th>Quantity</th>
                                                 <th>Price</th>
                                             </tr>
@@ -205,18 +211,27 @@
                                             @foreach ($history as $historys)
                                                 <tr>
                                                     <td>
-                                                        <strong>{{ $historys->seller->username }}</strong>
+                                                        <strong>{{ $historys->listing->seller->username }}</strong>
                                                         <br>
-                                                        <small class="text-muted">Member since
-                                                            {{ $historys->seller->created_at->format('M Y') }}</small>
                                                     </td>
                                                     <td>
-                                                        {{ $historys->created_at->format('M d, Y') }}
+                                                        @if ($historys->buyer)
+                                                            <strong>{{ $historys->buyer->username }}</strong>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($historys->purchased_at)
+                                                            {{ \Carbon\Carbon::parse($historys->purchased_at)->format('M d, Y H:i') }}
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
                                                     </td>
                                                     <td>{{ $historys->quantity }}</td>
                                                     <td>
                                                         <strong
-                                                            class="text-success">${{ number_format($historys->price, 2) }}</strong>
+                                                            class="text-success">${{ number_format($historys->price_at_purchase, 2) }}</strong>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -409,6 +424,130 @@
                     }
                 });
             }
+
+            // Buy listing functionality
+            const buyButtons = document.querySelectorAll('.buy-btn');
+            const buyModal = new bootstrap.Modal(document.getElementById('buyModal'));
+            const buyForm = document.getElementById('buyForm');
+            const buyQuantity = document.getElementById('buyQuantity');
+            const modalCardName = document.getElementById('modalCardName');
+            const modalPrice = document.getElementById('modalPrice');
+            const totalPriceEl = document.getElementById('totalPrice');
+            const balanceInfo = document.getElementById('balanceInfo');
+            const decreaseQtyBtn = document.getElementById('decreaseQty');
+            const increaseQtyBtn = document.getElementById('increaseQty');
+            let currentListingId = null;
+            let currentPrice = 0;
+            let maxQuantity = 0;
+
+            const formatCurrency = (value) => {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(value);
+            };
+
+            const updateTotal = () => {
+                const qty = parseInt(buyQuantity.value) || 1;
+                const total = currentPrice * qty;
+                totalPriceEl.textContent = formatCurrency(total);
+            };
+
+            buyQuantity.addEventListener('change', updateTotal);
+            buyQuantity.addEventListener('input', updateTotal);
+
+            decreaseQtyBtn.addEventListener('click', () => {
+                const current = parseInt(buyQuantity.value) || 1;
+                if (current > 1) {
+                    buyQuantity.value = current - 1;
+                    updateTotal();
+                }
+            });
+
+            increaseQtyBtn.addEventListener('click', () => {
+                const current = parseInt(buyQuantity.value) || 1;
+                if (current < maxQuantity) {
+                    buyQuantity.value = current + 1;
+                    updateTotal();
+                } else {
+                    alert('Maximum available quantity reached!');
+                }
+            });
+
+            buyButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    console.log('Buy button clicked!');
+                    currentListingId = btn.dataset.listingId;
+                    const cardName = btn.dataset.cardName;
+                    currentPrice = parseFloat(btn.dataset.price);
+                    maxQuantity = parseInt(btn.dataset.quantity);
+
+                    console.log('Listing ID:', currentListingId, 'Card:', cardName, 'Price:', currentPrice, 'Max Qty:', maxQuantity);
+
+                    modalCardName.textContent = cardName;
+                    modalPrice.textContent = formatCurrency(currentPrice);
+                    buyQuantity.value = 1;
+                    buyQuantity.max = maxQuantity;
+                    balanceInfo.textContent = 'Your current balance: Rp ' + ({{ session()->get('user_id') ? auth()->user()->balance ?? 0 : 0 }}).toLocaleString('id-ID');
+                    
+                    updateTotal();
+                    console.log('Opening buy modal');
+                    buyModal.show();
+                });
+            });
+
+            buyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log('Buy form submitted');
+
+                const quantity = parseInt(buyQuantity.value);
+                const submitBtn = document.getElementById('submitBuyBtn');
+                const originalBtnText = submitBtn.innerHTML;
+
+                console.log('Submitting purchase - Listing ID:', currentListingId, 'Quantity:', quantity);
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+
+                try {
+                    console.log('Fetching /buy-listing/' + currentListingId);
+                    const response = await fetch(`/buy-listing/${currentListingId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            quantity: quantity
+                        })
+                    });
+
+                    // Log response for debugging
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+                    const data = await response.json();
+                    console.log('Response data:', data);
+
+                    // Check if response is successful
+                    if (response.ok) {
+                        // Show success message before reload
+                        showMessage('success', data.message || 'Purchase successful! Adding card to your inventory...');
+                        setTimeout(() => {
+                            window.location.href = '{{ url('/cards/' . $card->id) }}';
+                        }, 1500);
+                    } else {
+                        throw new Error(data.error || 'Purchase failed');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage('danger', error.message || 'Purchase failed. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            });
         });
     </script>
 
@@ -457,4 +596,106 @@
         </div>
     </div>
 
+    <!-- Buy Modal -->
+    <div class="modal fade" id="buyModal" tabindex="-1" aria-labelledby="buyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="buyModalLabel">Purchase Card</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="buyForm" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Card</label>
+                            <p class="form-control-plaintext"><strong id="modalCardName"></strong></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Unit Price</label>
+                            <p class="form-control-plaintext"><strong id="modalPrice"></strong></p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quantity</label>
+                            <div class="input-group">
+                                <button class="btn btn-outline-secondary" type="button" id="decreaseQty">-</button>
+                                <input type="number" id="buyQuantity" name="quantity" class="form-control text-center" value="1" min="1" required>
+                                <button class="btn btn-outline-secondary" type="button" id="increaseQty">+</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Total Price</label>
+                            <h3 class="text-success"><strong id="totalPrice">Rp 0</strong></h3>
+                        </div>
+
+                        <div class="alert alert-info" role="alert">
+                            <small id="balanceInfo"></small>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" id="submitBuyBtn">
+                            <i class="lni lni-cart"></i> Confirm Purchase
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
+
+<style>
+    /* Checkout animations */
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .modal-content {
+        animation: slideInDown 0.3s ease-out;
+    }
+
+    .btn-primary:active {
+        animation: pulse 0.3s ease-out;
+    }
+
+    .alert {
+        animation: slideInDown 0.4s ease-out;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+        transition: background-color 0.2s ease;
+    }
+</style>

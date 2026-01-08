@@ -21,6 +21,7 @@ class Listings extends Model
         'description',
         'quantity',
         'is_active',
+        'status',
         'created_at',
     ];
 

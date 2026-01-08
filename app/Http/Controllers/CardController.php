@@ -106,12 +106,20 @@ class CardController extends Controller
                         ->orderBy('price', 'asc')
                         ->get();
 
-        // History Listings
-            $history = Listings::where('card_id', $cardId)
-                            ->where('is_active', 0)
-                            ->with('seller')
-                            ->orderBy('price', 'asc')
-                            ->get();
+        // History - Get purchase history from order_items
+        $history = \App\Models\OrderItems::whereHas('listing', function($q) use ($cardId) {
+                        $q->where('card_id', $cardId);
+                    })
+                    ->with([
+                        'listing' => function($q) {
+                            $q->with('seller');
+                        },
+                        'buyer' => function($q) {
+                            $q->select('id', 'username', 'email');
+                        }
+                    ])
+                    ->orderBy('purchased_at', 'desc')
+                    ->get();
         
         // Get price history data (placeholder for now)
         $priceHistory = $this->generateMockPriceHistory($card->estimated_market_price);
@@ -168,6 +176,36 @@ class CardController extends Controller
             'is_active' => 1
         ]);
         return redirect()->back();
+    }
+
+    /**
+     * Cancel a listing
+     */
+    public function cancelListing(Request $request, $listingId)
+    {
+        $userId = $request->session()->get('user_id');
+        if (!$userId) {
+            return redirect('/login')->with('error', 'Please login first.');
+        }
+
+        $listing = Listings::findOrFail($listingId);
+
+        // Verify the user is the seller
+        if ($listing->seller_id !== (int)$userId) {
+            return redirect()->back()->with('error', 'You are not authorized to cancel this listing.');
+        }
+
+        try {
+            // Update listing status to cancelled
+            $listing->update([
+                    'is_active' => false,
+                'quantity' => 0
+            ]);
+
+            return redirect()->back()->with('success', 'Listing cancelled successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to cancel listing: ' . $e->getMessage());
+        }
     }
 
 }

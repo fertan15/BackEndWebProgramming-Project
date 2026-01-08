@@ -121,6 +121,8 @@ Route::post('/topup/notification', [TopUpController::class, 'handleNotification'
 //route checkout
 Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
 Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->name('purchase.process');
+Route::post('/buy-listing/{listingId}', [CheckoutController::class, 'buyListing'])->name('buy.listing');
+Route::post('/cancel-listing/{listingId}', [CardController::class, 'cancelListing'])->name('cancel.listing');
 
 // Settings route
 Route::get('/settings', [HomeController::class, 'showSettings'])->name('settings');

@@ -14,10 +14,10 @@ class OrderItems extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'order_id',
         'listing_id',
         'quantity',
         'price_at_purchase',
+        'buyer_id'
     ];
 
     protected $casts = [
@@ -25,13 +25,13 @@ class OrderItems extends Model
         'price_at_purchase' => 'decimal:2',
     ];
 
-    public function order()
-    {
-        return $this->belongsTo(Orders::class, 'order_id');
-    }
-
     public function listing()
     {
         return $this->belongsTo(Listings::class, 'listing_id');
+    }
+
+    public function buyer()
+    {
+        return $this->belongsTo(Users::class, 'buyer_id');
     }
 }
