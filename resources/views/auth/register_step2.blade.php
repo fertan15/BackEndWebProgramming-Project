@@ -5,12 +5,14 @@
 @section('content')
 
     @if(session('error'))
-        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p class="text-sm text-red-700">{{ session('error') }}</p>
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p class="text-sm font-semibold text-red-700">{{ session('error') }}</p>
         </div>
     @endif
-    <h2 class="text-xl font-semibold text-gray-800 mb-2">Create your account</h2>
-    <p class="text-sm text-gray-500 mb-6">Join PocketRader and start trading today</p>
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-slate-900">Verify your email</h2>
+        <p class="text-sm text-slate-600 mt-2">We've sent a 6-digit code to your email</p>
+    </div>
 
     <!-- Step Progress Indicator -->
     <div class="mb-8">
@@ -37,31 +39,31 @@
         @csrf
 
         <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-lg mb-6">
-            <p class="text-sm text-gray-700">
-                We've sent a 6-digit verification code to your email:
+            <p class="text-sm text-slate-700">
+                Sent to:
                 <span class="font-semibold text-indigo-600">{{ session('register.email', 'EMAIL_ADDRESS') }}</span> 
             </p>
         </div>
 
-        <label class="block text-sm font-medium text-gray-700 mb-2" for="otp-input">Enter OTP Code</label>
+        <label class="block text-sm font-semibold text-slate-700 mb-4">Enter OTP Code</label>
         <div class="flex justify-between space-x-2 mb-6">
             <!-- OTP Input fields (using hidden inputs for actual submission) -->
             @for ($i = 0; $i < 6; $i++)
                 <input type="text" maxlength="1" id="otp-{{ $i }}"
-                       class="w-1/6 h-14 text-3xl text-center border-2 border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                       class="w-1/6 h-14 text-3xl text-center border-2 border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 hover:border-slate-400"
                        inputmode="numeric" pattern="[0-9]" required>
             @endfor
             <!-- Hidden input for combined OTP value (will be populated by JS) -->
             <input type="hidden" name="otp_code" id="otp-code-hidden">
         </div>
-        <button type="button" id="btn-resend" onclick="startResendTimer()" class="w-full text-sm text-center text-indigo-600 font-semibold mb-6 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed">Kirim Ulang Kode </button>
+        <button type="button" id="btn-resend" onclick="startResendTimer()" class="w-full text-sm text-center text-indigo-600 font-semibold mb-6 hover:text-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Resend Code</button>
         <div class="flex space-x-4">
             <a href="{{ url('/register/step1') }}"
-               class="flex-1 text-center py-3 px-4 border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition duration-150 shadow-sm">
+               class="flex-1 text-center py-3 px-4 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition duration-150 shadow-sm">
                 Back
             </a>
             <button type="submit"
-                    class="flex-1 bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-150 shadow-lg shadow-indigo-200">
+                    class="flex-1 bg-[#365AF7] text-white font-semibold py-3 px-4 rounded-lg hover:bg-[#2f4ed6] focus:outline-none focus:ring-4 focus:ring-indigo-300 transition duration-150 shadow-md shadow-indigo-200">
                 Verify
             </button>
         </div>

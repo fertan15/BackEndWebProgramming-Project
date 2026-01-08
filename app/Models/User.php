@@ -13,14 +13,36 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Disable timestamps since the database table doesn't have created_at/updated_at columns.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
+        'password_hash',
+        'phone_number',
+        'balance',
+        'identity_type',
+        'identity_number',
+        'identity_image_url',
+        'identity_status',
+        'otp_code',
+        'otp_expires_at',
+        'account_status',
+        'ban_reason',
+        'banned_at',
+        'is_admin',
+        'last_online',
     ];
 
     /**

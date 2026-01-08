@@ -4,9 +4,9 @@
 
 @section('content')
     <div class="max-w-xl">
-        <div class="mb-6">
-            <h3 class="text-2xl font-semibold text-slate-900">Create your account</h3>
-            <p class="text-sm text-slate-500">Join PocketRader and start trading today</p>
+        <div class="mb-8">
+            <h3 class="text-3xl font-bold text-slate-900">Create your account</h3>
+            <p class="text-sm text-slate-600 mt-2">Join PocketRader and start trading today</p>
         </div>
 
         <div class="mb-8">
@@ -34,10 +34,11 @@
 
             <!-- Display validation errors -->
             @if ($errors->any())
-                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm font-semibold text-red-700 mb-2">Please fix the errors:</p>
                     <ul class="text-sm text-red-600 space-y-1">
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li>• {{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -85,9 +86,14 @@
             </label>
 
             <button type="submit"
-                    class="w-full h-12 rounded-lg bg-[#365AF7] text-white font-semibold shadow-md shadow-indigo-200 hover:bg-[#2f4ed6] transition">
-                Sign Up
+                    class="w-full h-12 rounded-lg bg-[#365AF7] text-white font-semibold shadow-md shadow-indigo-200 hover:bg-[#2f4ed6] transition duration-200 mt-6">
+                Continue to Verification
             </button>
+
+            <p class="text-sm text-slate-600 text-center mt-4">
+                Already have an account?
+                <a href="{{ url('/login') }}" class="font-semibold text-indigo-600 hover:text-indigo-700">Sign In</a>
+            </p>
         </form>
     </div>
 @endsection

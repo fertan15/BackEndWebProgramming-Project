@@ -85,6 +85,7 @@ Route::get('/cards', [CardController::class, 'showAllCards'])->name('cards');
 Route::get('/cards/{cardId}', [CardController::class, 'showCardDetail'])->name('card.detail');
 
 Route::get('/viewprofile', [HomeController::class, 'viewprofile'])->name('view_profile');
+Route::post('/viewprofile', [HomeController::class, 'updateProfile'])->name('update_profile');
 // Route::get('/cards',  [HomeController::class, 'showCard'])->name('cards'); 
 Route::get('/wishlist', [HomeController::class, 'showWishlist'])->name('wishlist');
 Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist'])->name('wishlist.toggle');

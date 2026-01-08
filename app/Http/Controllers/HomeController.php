@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Wishlists;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -30,9 +31,45 @@ class HomeController extends Controller
     /**
      * View profile page.
      */
-    public function viewprofile()
+    public function viewprofile(Request $request)
     {
-        return view('view_profile');
+        // Prefer authenticated user, fallback to session user_id used elsewhere in the app
+        $user = auth()->user();
+        if (!$user) {
+            $userId = $request->session()->get('user_id');
+            $user = $userId ? User::find($userId) : null;
+        }
+
+        return view('view_profile', compact('user'));
+    }
+
+    /**
+     * Update user profile (email not editable).
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            $userId = $request->session()->get('user_id');
+            $user = $userId ? User::find($userId) : null;
+        }
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Please login first');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
+            'phone_number' => 'nullable|string|max:20',
+            'identity_type' => 'nullable|in:KTP,SIM,Passport',
+            'identity_number' => 'nullable|string|max:50|unique:users,identity_number,' . $user->id,
+            'identity_image_url' => 'nullable|url|max:255',
+        ]);
+
+        $user->update($validated);
+
+        return redirect()->route('view_profile')->with('success', 'Profile updated successfully!');
     }
 
     /**

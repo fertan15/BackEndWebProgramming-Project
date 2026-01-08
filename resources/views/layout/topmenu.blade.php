@@ -129,8 +129,6 @@
                         <button class="dropdown-toggle bg-transparent border-0" type="button" id="profile"
                             data-bs-toggle="dropdown" aria-expanded="false">
 
-                                <button onclick="location.href='/login'" class="border-0 bg-transparent">
-
                                     <div class="profile-info text-left">
                                         <div class="info">
                                             <div class="image" id="guestAvatar" data-name="Guest" data-image="">
