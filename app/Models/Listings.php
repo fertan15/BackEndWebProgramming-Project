@@ -23,6 +23,7 @@ class Listings extends Model
         'is_active',
         'status',
         'created_at',
+        'user_collection_id',
     ];
 
     protected $casts = [

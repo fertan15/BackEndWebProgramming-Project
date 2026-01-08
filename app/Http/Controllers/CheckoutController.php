@@ -127,23 +127,53 @@ class CheckoutController extends Controller
                 $user->update(['balance' => $newBalance]);
 
                 // Get seller info
-                $seller = Users::find($listing->user_id);
+                $seller = Users::find($listing->seller_id);
                 
                 // Add balance to seller
                 if ($seller) {
-                    $seller->balance += $totalPrice;
-                    $seller->save();
+                    DB::table('users')
+                        ->where('id', $seller->id)
+                        ->update(['balance' => DB::raw('balance + ' . $totalPrice)]);
+
+                }else{
+                    dd('Seller not found');
                 }
 
                 // Add card to user collection
-                for ($i = 0; $i < $quantity; $i++) {
-                    UserCollections::create([
-                        'user_id' => $userId,
-                        'card_id' => $listing->card_id,
-                        'condition_text' => $listing->condition_text,
-                        'is_for_trade' => false,
-                        'added_at' => now(),
-                    ]);
+                // If listing has user_collection_id, transfer ownership instead of creating new
+                if ($listing->user_collection_id) {
+                    // Transfer the collection item to the buyer
+                    $collectionItem = UserCollections::find($listing->user_collection_id);
+                    if ($collectionItem) {
+                        $collectionItem->update([
+                            'user_id' => $userId,
+                            'is_for_trade' => false,
+                            'is_listed' => false,
+                            'added_at' => now(),
+                        ]);
+                    } else {
+                        // Fallback: create new if collection item not found
+                        UserCollections::create([
+                            'user_id' => $userId,
+                            'card_id' => $listing->card_id,
+                            'condition_text' => $listing->condition_text,
+                            'is_for_trade' => false,
+                            'is_listed' => false,
+                            'added_at' => now(),
+                        ]);
+                    }
+                } else {
+                    // Create new collection item (for listings not from inventory)
+                    for ($i = 0; $i < $quantity; $i++) {
+                        UserCollections::create([
+                            'user_id' => $userId,
+                            'card_id' => $listing->card_id,
+                            'condition_text' => $listing->condition_text,
+                            'is_for_trade' => false,
+                            'is_listed' => false,
+                            'added_at' => now(),
+                        ]);
+                    }
                 }
 
                 // Create order item record
@@ -184,6 +214,15 @@ class CheckoutController extends Controller
                         'quantity' => $newQuantity,
                         'is_active' => $isActive
                     ]);
+
+                // If listing is sold out, mark seller's collection item as not listed
+                if ($isActive == 0) {
+                    DB::table('user_collections')
+                        ->where('user_id', $listing->user_id)
+                        ->where('card_id', $listing->card_id)
+                        ->where('is_listed', true)
+                        ->update(['is_listed' => false]);
+                }
             });
 
             if ($isAjax) {

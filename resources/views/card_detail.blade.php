@@ -117,9 +117,14 @@
                                 </span>
 
                                 @if (session()->get('user_id'))
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal">
-                                        Add Listings
+                                    @php
+                                        $userHasListing = $listings->contains('seller_id', session()->get('user_id'));
+                                    @endphp
+                                    <button type="button" class="btn btn-primary btn-sm" 
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal"
+                                        @if($userHasListing) disabled @endif>
+                                        {{ $userHasListing ? 'Listed' : 'Add Listings' }}
                                     </button>
                                 @endif
                             </div>

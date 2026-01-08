@@ -146,6 +146,19 @@
                     <span class="text">Top Up</span>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="{{ route('inventory.index') }}">
+                <span class="icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 3C2.89543 3 2 3.89543 2 5V15C2 16.1046 2.89543 17 4 17H16C17.1046 17 18 16.1046 18 15V5C18 3.89543 17.1046 3 16 3H4ZM4 5H16V15H4V5Z" />
+                        <path d="M7 7C6.44772 7 6 7.44772 6 8V12C6 12.5523 6.44772 13 7 13H13C13.5523 13 14 12.5523 14 12V8C14 7.44772 13.5523 7 13 7H7ZM8 9H12V11H8V9Z" />
+                    </svg>
+                </span>
+                <span class="text">My Inventory</span>
+                </a>
+            </li>
+
             @endauth
             
             <span class="divider">
@@ -174,6 +187,7 @@
                     </span>
                 </a>
             </li>
+
         </ul>
     </nav>
 </aside>

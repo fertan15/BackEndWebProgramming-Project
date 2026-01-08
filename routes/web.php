@@ -90,6 +90,10 @@ Route::post('/viewprofile', [HomeController::class, 'updateProfile'])->name('upd
 // Route::get('/cards',  [HomeController::class, 'showCard'])->name('cards'); 
 Route::get('/wishlist', [HomeController::class, 'showWishlist'])->name('wishlist');
 Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist'])->name('wishlist.toggle');
+Route::get('/inventory', [HomeController::class, 'showInventory'])->name('inventory.index');
+Route::post('/inventory/add-listing/{collectionId}', [HomeController::class, 'addListing'])->name('inventory.addListing');
+Route::post('/inventory/lock/{collectionId}', [HomeController::class, 'lockCard'])->name('inventory.lock');
+Route::post('/inventory/unlock/{collectionId}', [HomeController::class, 'unlockCard'])->name('inventory.unlock');
 Route::get('/dashboard', function () {
     // In a real app, this view would be in resources/views/dashboard.blade.php
     return "<h1>Dashboard</h1><p>You have successfully logged in or registered!</p><p>Message: Registration Complete! Welcome to PocketRader.</p>";

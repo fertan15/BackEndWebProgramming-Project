@@ -202,6 +202,12 @@ class CardController extends Controller
                 'quantity' => 0
             ]);
 
+            // Mark the user's collection item as not listed
+            \App\Models\UserCollections::where('user_id', $userId)
+                ->where('card_id', $listing->card_id)
+                ->where('is_listed', true)
+                ->update(['is_listed' => false]);
+
             return redirect()->back()->with('success', 'Listing cancelled successfully!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to cancel listing: ' . $e->getMessage());

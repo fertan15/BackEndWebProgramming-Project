@@ -155,4 +155,121 @@ class HomeController extends Controller
     {
         return view('settings');
     }
+
+    /**
+     * Show inventory page with user's collected cards
+     */
+    public function showInventory(Request $request)
+    {
+        if (!auth()->check()) {
+            return redirect('/login')->with('error', 'Please login to view your inventory.');
+        }
+
+        $userId = auth()->id();
+        
+        // Get tradeable cards (is_for_trade = true)
+        $tradeableCards = \App\Models\UserCollections::where('user_id', $userId)
+                        ->where('is_for_trade', true)
+                        ->with(['card' => function($q) {
+                            $q->with('cardSet');
+                        }])
+                        ->orderBy('added_at', 'desc')
+                        ->get();
+
+        // Get locked cards (is_for_trade = false)
+        $lockedCards = \App\Models\UserCollections::where('user_id', $userId)
+                        ->where('is_for_trade', false)
+                        ->with(['card' => function($q) {
+                            $q->with('cardSet');
+                        }])
+                        ->orderBy('added_at', 'desc')
+                        ->get();
+
+        return view('inventory', [
+            'tradeableCards' => $tradeableCards,
+            'lockedCards' => $lockedCards
+        ]);
+    }
+
+    /**
+     * Create a listing for a card in user's collection
+     */
+    public function addListing(Request $request, $collectionId)
+    {
+        if (!auth()->check()) {
+            return redirect('/login')->with('error', 'Please login to add listings.');
+        }
+
+        $userId = auth()->id();
+        
+        // Verify the collection belongs to the user
+        $collection = \App\Models\UserCollections::where('id', $collectionId)
+                            ->where('user_id', $userId)
+                            ->firstOrFail();
+
+        $request->validate([
+            'price' => 'required|numeric|min:0.01'
+        ]);
+
+        try {
+            // Create listing with collection's condition and quantity of 1
+            \App\Models\Listings::create([
+                'card_id' => $collection->card_id,
+                'seller_id' => $userId,
+                'price' => $request->price,
+                'condition_text' => $collection->condition_text,
+                'description' => '',
+                'quantity' => 1,
+                'is_active' => 1,
+                'user_collection_id' => $collectionId
+            ]);
+
+            // Mark the collection item as listed
+            $collection->update(['is_listed' => true]);
+
+            return redirect()->route('inventory.index')->with('success', 'Listing created successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to create listing: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Lock a card to prevent accidental listing
+     */
+    public function lockCard(Request $request, $collectionId)
+    {
+        if (!auth()->check()) {
+            return redirect('/login')->with('error', 'Please login.');
+        }
+
+        $userId = auth()->id();
+        
+        $collection = \App\Models\UserCollections::where('id', $collectionId)
+                            ->where('user_id', $userId)
+                            ->firstOrFail();
+
+        $collection->update(['is_for_trade' => false]);
+
+        return redirect()->route('inventory.index')->with('success', 'Card locked successfully!');
+    }
+
+    /**
+     * Unlock a card to make it tradeable
+     */
+    public function unlockCard(Request $request, $collectionId)
+    {
+        if (!auth()->check()) {
+            return redirect('/login')->with('error', 'Please login.');
+        }
+
+        $userId = auth()->id();
+        
+        $collection = \App\Models\UserCollections::where('id', $collectionId)
+                            ->where('user_id', $userId)
+                            ->firstOrFail();
+
+        $collection->update(['is_for_trade' => true]);
+
+        return redirect()->route('inventory.index')->with('success', 'Card unlocked successfully!');
+    }
 }

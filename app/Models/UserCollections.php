@@ -19,6 +19,7 @@ class UserCollections extends Model
         'condition_text',
         'is_for_trade',
         'added_at',
+        'is_listed',
     ];
 
     protected $casts = [

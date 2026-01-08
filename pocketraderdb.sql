@@ -170,12 +170,15 @@ CREATE TABLE `listings` (
   `description` TEXT DEFAULT NULL,
   `quantity` INT(11) DEFAULT 1,
   `is_active` TINYINT(1) DEFAULT 1,
+  `user_collection_id` INT(11) DEFAULT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   KEY `seller_id` (`seller_id`),
+  KEY `user_collection_id` (`user_collection_id`),
   KEY `idx_listings_filter` (`card_id`,`is_active`,`price`),
   CONSTRAINT `listings_ibfk_1` FOREIGN KEY (`card_id`) REFERENCES `cards` (`id`),
-  CONSTRAINT `listings_ibfk_2` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  CONSTRAINT `listings_ibfk_2` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `listings_ibfk_3` FOREIGN KEY (`user_collection_id`) REFERENCES `user_collections` (`id`) ON DELETE SET NULL
 ) ENGINE=INNODB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `listings` */
@@ -340,6 +343,7 @@ CREATE TABLE `user_collections` (
   `card_id` INT(11) NOT NULL,
   `condition_text` ENUM('Mint','Near Mint','Lightly Played','Heavily Played','Damaged') DEFAULT NULL,
   `is_for_trade` TINYINT(1) DEFAULT 0,
+  `is_listed` TINYINT(1) DEFAULT 0,
   `added_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
