@@ -83,6 +83,7 @@ Route::get('/cards', [CardController::class, 'showAllCards'])->name('cards');
 
 // nampilin individu
 Route::get('/cards/{cardId}', [CardController::class, 'showCardDetail'])->name('card.detail');
+Route::post('/savelistings', [CardController::class, 'savelisting'])->name('savelistings');
 
 Route::get('/viewprofile', [HomeController::class, 'viewprofile'])->name('view_profile');
 Route::post('/viewprofile', [HomeController::class, 'updateProfile'])->name('update_profile');
@@ -121,6 +122,8 @@ Route::post('/topup/notification', [TopUpController::class, 'handleNotification'
 Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
 Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->name('purchase.process');
 
+// Settings route
+Route::get('/settings', [HomeController::class, 'showSettings'])->name('settings');
 
 // Admin area
 Route::prefix('admin')->name('admin.')->group(function () {

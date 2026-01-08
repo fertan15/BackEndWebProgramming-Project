@@ -105,6 +105,13 @@ class CardController extends Controller
                         ->with('seller')
                         ->orderBy('price', 'asc')
                         ->get();
+
+        // History Listings
+            $history = Listings::where('card_id', $cardId)
+                            ->where('is_active', 0)
+                            ->with('seller')
+                            ->orderBy('price', 'asc')
+                            ->get();
         
         // Get price history data (placeholder for now)
         $priceHistory = $this->generateMockPriceHistory($card->estimated_market_price);
@@ -119,6 +126,7 @@ class CardController extends Controller
             'card' => $card,
             'isInWishlist' => $isInWishlist,
             'listings' => $listings,
+            'history' => $history,
             'priceHistory' => $priceHistory,
             'relatedCards' => $relatedCards
         ]);
@@ -148,4 +156,18 @@ class CardController extends Controller
             'prices' => $prices
         ];
     }
+
+    public function savelisting(Request $request) {
+        Listings::create([
+            'card_id' => $request->cardid,
+            'seller_id' => $request->sellerid,
+            'price' => $request->price,
+            'condition_text' => $request->condition,
+            'description' => '',
+            'quantity' => $request->quantity,
+            'is_active' => 1
+        ]);
+        return redirect()->back();
+    }
+
 }

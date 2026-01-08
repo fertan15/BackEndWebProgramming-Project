@@ -147,4 +147,12 @@ class HomeController extends Controller
             return redirect()->back()->with('success', 'Added to wishlist');
         }
     }
+
+    /**
+     * Show settings page.
+     */
+    public function showSettings(Request $request)
+    {
+        return view('settings');
+    }
 }

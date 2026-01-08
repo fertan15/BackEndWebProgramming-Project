@@ -109,10 +109,10 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#0"> <i class="lni lni-inbox"></i> Messages </a>
+                                <a href="{{ route('chat') }}"> <i class="lni lni-inbox"></i> Messages </a>
                             </li>
                             <li>
-                                <a href="#0"> <i class="lni lni-cog"></i> Settings </a>
+                                <a href="{{ route('settings') }}"> <i class="lni lni-cog"></i> Settings </a>
                             </li>
                             <li class="divider"></li>
                             <li>
@@ -128,6 +128,8 @@
                     <div class="profile-box ml-15">
                         <button class="dropdown-toggle bg-transparent border-0" type="button" id="profile"
                             data-bs-toggle="dropdown" aria-expanded="false">
+
+                                <button onclick="location.href='/login'" class="border-0 bg-transparent">
 
                                     <div class="profile-info text-left">
                                         <div class="info">
