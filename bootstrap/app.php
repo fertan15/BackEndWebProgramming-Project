@@ -14,11 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \App\Http\Middleware\Authenticate::class,
         ]);
-
-        $middleware->validateCsrfTokens(except: [
-        '/midtrans-notification', 
-        ]);
     })
+
+    ->withMiddleware(function (Middleware $middleware) {
+    $middleware->validateCsrfTokens(except: [
+        '/topup/notification', 
+    ]);
+})
     
     ->withExceptions(function (Exceptions $exceptions): void {
     })->create();

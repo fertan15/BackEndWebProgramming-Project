@@ -1,91 +1,112 @@
 @extends('layout.main')
 
 @section('main_contents')
-<div class="container py-5 d-flex justify-content-center">
-    <div class="card border-0 shadow-lg p-5" style="width: 450px; border-radius: 20px;">
-        <h3 class="fw-bold text-center mb-1">Top Up Wallet</h3>
-        <p class="text-muted text-center small mb-4">Pay in IDR, Receive in USD</p>
-
-        <div class="p-3 bg-light rounded-4 mb-4">
-            <div class="d-flex justify-content-between small text-secondary">
-                <span>Current Balance:</span>
-                <span class="fw-bold text-dark">${{ number_format((float)$currentUser->balance, 2) }}</span>
+<div class="container py-5">
+    <div class="card mx-auto shadow-sm" style="max-width: 400px; border-radius: 15px;">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-3">Top Up Wallet</h4>
+            <div class="mb-4 text-center p-3 bg-light rounded">
+                <small class="text-muted d-block">Current Balance</small>
+                <span class="h4 fw-bold text-primary">${{ number_format($currentUser->balance, 2) }}</span>
             </div>
-        </div>
 
-        <div class="mb-4">
-            <label class="form-label fw-bold">Amount to Pay (IDR)</label>
-            <div class="input-group input-group-lg">
-                <span class="input-group-text bg-white border-end-0">Rp</span>
-                <input type="number" id="idrAmount" class="form-control border-start-0" placeholder="100000" min="10000">
-            </div>
+            <label class="form-label small fw-bold">Amount to Pay (IDR)</label>
+            <input type="text" id="idrAmountDisplay" class="form-control form-control-lg mb-3" placeholder="Contoh: 100.000">
             
-            <div class="mt-3 p-3 border rounded-3 bg-white shadow-sm">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="small text-muted">You will receive:</span>
-                    <span id="usdResult" class="h4 fw-bold text-primary mb-0">$0.00</span>
-                </div>
-                <hr class="my-2">
-                <div class="d-flex justify-content-between small">
-                    <span class="text-muted">Exchange Rate:</span>
-                    <span class="text-secondary">$1 = Rp 15.800</span>
-                </div>
+            <div class="d-flex justify-content-between mb-4 px-1">
+                <span class="small text-muted">Estimated USD:</span>
+                <span id="usdResult" class="small fw-bold">$0.00</span>
             </div>
-        </div>
 
-        <button id="pay-button" class="btn btn-primary btn-lg w-100 py-3 rounded-pill fw-bold shadow">
-            Proceed to Payment
-        </button>
+            <button id="pay-button" class="btn btn-primary w-100 py-2 fw-bold">Pay Now</button>
+        </div>
     </div>
 </div>
 
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 
 <script>
-    const idrInput = document.getElementById('idrAmount');
-    const usdText = document.getElementById('usdResult');
     const rate = 15800;
+    const amountInput = document.getElementById('idrAmountDisplay');
+    const usdResult = document.getElementById('usdResult');
 
-    // LIVE CONVERSION LOGIC
-    idrInput.oninput = function() {
-        let idrValue = parseFloat(this.value) || 0;
-        let usdValue = idrValue / rate;
-        usdText.innerText = '$' + usdValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    // Fungsi untuk memformat angka menjadi ribuan (1.000.000)
+    function formatRupiah(angka) {
+        let number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        return rupiah;
+    }
+
+    // Live update format ribuan dan estimasi USD
+    amountInput.onkeyup = function() {
+        // Simpan angka murni (tanpa titik)
+        let rawValue = this.value.replace(/\./g, '');
+        
+        // Update tampilan input dengan format titik
+        this.value = formatRupiah(this.value);
+        
+        // Update estimasi USD
+        const val = parseFloat(rawValue) || 0;
+        usdResult.innerText = '$' + (val / rate).toFixed(2);
     };
 
-    document.getElementById('pay-button').onclick = function() {
-        const amount = idrInput.value;
-        if (!amount || amount < 10000) {
-            alert("Minimum payment is Rp 10.000");
+    document.getElementById('pay-button').onclick = function(e) {
+        e.preventDefault();
+        
+        // Ambil nilai asli (hilangkan titik sebelum dikirim ke controller)
+        const idrValue = amountInput.value.replace(/\./g, '');
+
+        if (!idrValue || idrValue < 10000) {
+            alert("Minimal top up adalah Rp 10.000");
             return;
         }
 
         this.disabled = true;
-        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
+        this.innerText = "Processing...";
 
         fetch("{{ route('topup.snap') }}", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-            body: JSON.stringify({ amount_idr: amount })
+            headers: { 
+                "Content-Type": "application/json", 
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ amount_idr: idrValue }) // Mengirim angka murni
         })
-        .then(r => r.json())
+        .then(async r => {
+            const res = await r.json();
+            if (!r.ok) throw new Error(res.error || 'Terjadi kesalahan server');
+            return res;
+        })
         .then(data => {
             if (data.snap_token) {
                 window.snap.pay(data.snap_token, {
-                    onSuccess: function() { window.location.href = "/home?success=1"; },
-                    onClose: function() { location.reload(); }
+                    onSuccess: (result) => { window.location.href = "/home?success=1"; },
+                    onPending: (result) => { window.location.href = "/home?pending=1"; },
+                    onError: (result) => { alert("Pembayaran gagal!"); resetBtn(); },
+                    onClose: () => { alert("Popup ditutup"); resetBtn(); }
                 });
-            } else {
-                alert("Error: " + (data.error || "Token failed"));
-                location.reload();
             }
         })
         .catch(err => {
-            alert("Connection error. Check console.");
-            console.error(err);
-            this.disabled = false;
-            this.innerText = "Proceed to Payment";
+            alert(err.message);
+            resetBtn();
         });
+
+        function resetBtn() {
+            const btn = document.getElementById('pay-button');
+            btn.disabled = false;
+            btn.innerText = "Pay Now";
+        }
     };
 </script>
 @endsection

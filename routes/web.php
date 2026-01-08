@@ -114,8 +114,7 @@ Route::middleware(['auth'])->group(function () {
 //route top up
 Route::get('/topup', [TopUpController::class, 'show'])->name('topup.show');
 Route::post('/topup/snap', [TopUpController::class, 'getSnapToken'])->name('topup.snap');
-Route::post('/midtrans-notification', [TopUpController::class, 'handleNotification']);
-
+Route::post('/topup/notification', [TopUpController::class, 'handleNotification']);
 
 //route checkout
 Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
