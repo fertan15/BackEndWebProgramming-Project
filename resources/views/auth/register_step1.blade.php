@@ -32,6 +32,17 @@
         <form method="POST" action="{{ url('/register/step2') }}" class="space-y-5">
             @csrf
 
+            <!-- Display validation errors -->
+            @if ($errors->any())
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <ul class="text-sm text-red-600 space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="space-y-2">
                 <label class="text-sm font-medium text-slate-700" for="fullname">Name</label>
                 <input type="text" id="fullname" name="fullname" placeholder="Name" required
