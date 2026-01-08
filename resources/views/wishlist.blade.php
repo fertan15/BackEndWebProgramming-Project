@@ -43,7 +43,7 @@
             @if($wishlistItems->isEmpty())
                 <div class="row">
                     <div class="col-12">
-                        <div class="card" id="wishlist-empty-state">
+                        <div class="card" id="wishlist-empty-state-initial">
                             <div class="card-body text-center py-5">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-heart text-muted mb-3" viewBox="0 0 16 16">
                                     <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
@@ -59,19 +59,27 @@
                 <div class="row g-4" id="wishlist-items-grid">
                     @foreach ($wishlistItems as $item)
                         <div class="col-xl-3 col-lg-3 col-sm-6" data-wishlist-card="{{ $item->card->id }}">
-                            <div class="card">
-                                <img src="{{ asset($item->card->image_url) }}" class="card-img-top" alt="{{ $item->card->name }}">
+                            <div class="card h-100 shadow-sm border-0">
+                                <a href="{{ route('card.detail', $item->card->id) }}">
+                                    <img src="{{ asset($item->card->image_url) }}" class="card-img-top" alt="{{ $item->card->name }}">
+                                </a>
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ $item->card->name }}</h5>
-                                    <p class="card-text">
+                                    <h5 class="card-title text-dark">{{ $item->card->name }}</h5>
+                                    <p class="card-text mb-3">
                                         <small class="text-muted">Rarity: {{ $item->card->rarity }}</small><br>
                                         <small class="text-muted">Type: {{ $item->card->card_type }}</small><br>
                                         @if($item->card->estimated_market_price)
                                             <strong class="text-primary">${{ number_format($item->card->estimated_market_price, 2) }}</strong>
                                         @endif
                                     </p>
+                                    
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <a href="#" class="btn btn-primary btn-sm">Trade</a>
+                                        <div class="btn-group-wrapper d-flex gap-1">
+                                            <a href="{{ route('card.detail', $item->card->id) }}" class="btn btn-info btn-sm text-white">Details</a>
+                                            
+                                            <a href="#" class="btn btn-primary btn-sm">Trade</a>
+                                        </div>
+
                                         <form action="{{ route('wishlist.toggle', $item->card->id) }}" method="POST" style="display: inline;" class="wishlist-remove-form">
                                             @csrf
                                             <button type="submit" class="btn btn-outline-danger btn-sm wishlist-remove-btn" data-card-id="{{ $item->card->id }}" title="Remove from Wishlist">
@@ -82,14 +90,18 @@
                                             </button>
                                         </form>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Added: {{ $item->added_at->format('M d, Y') }}</small>
+
+                                    <small class="text-muted d-block mt-3 pt-2 border-top">
+                                        Added: {{ $item->added_at ? $item->added_at->format('M d, Y') : '-' }}
+                                    </small>
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
+
                 <div id="wishlist-empty-state" class="d-none">
-                    <div class="card">
+                    <div class="card shadow-sm">
                         <div class="card-body text-center py-5">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-heart text-muted mb-3" viewBox="0 0 16 16">
                                 <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
@@ -147,14 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Unable to update wishlist');
 
-                if (!response.ok) {
-                    throw new Error(data.message || 'Unable to update wishlist');
-                }
-
-                if (cardWrapper) {
-                    cardWrapper.remove();
-                }
+                if (cardWrapper) cardWrapper.remove();
 
                 if (itemsGrid && itemsGrid.querySelectorAll('[data-wishlist-card]').length === 0 && emptyState) {
                     itemsGrid.classList.add('d-none');
