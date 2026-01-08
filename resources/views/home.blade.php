@@ -26,7 +26,7 @@
                                 <a href="{{ route('card_sets') }}" class="btn btn-warning pokemon-btn-xl">
                                     View Card Sets
                                 </a>
-                                <a href="#cards-grid" class="btn btn-outline-light pokemon-btn-outline-xl">
+                                <a href="{{ route('cards') }}" class="btn btn-outline-light pokemon-btn-outline-xl">
                                     Explore Cards
                                 </a>
                             </div>
@@ -64,9 +64,9 @@
         position: absolute;
         inset: 0;
         background:
-            radial-gradient(1200px 500px at 20% 20%, rgba(255, 203, 5, 0.22), transparent 55%),
-            radial-gradient(900px 450px at 80% 30%, rgba(13, 110, 253, 0.22), transparent 55%),
-            linear-gradient(90deg, rgba(5, 5, 10, 0.82), rgba(5, 5, 10, 0.35));
+            radial-gradient(1200px 500px at 20% 20%, #07B9CE, transparent 55%),
+            radial-gradient(900px 450px at 80% 30%, #3969E7, transparent 55%),
+            linear-gradient(90deg, rgba(125, 42, 231, 0.82), rgba(125, 42, 231, 0.35));
         backdrop-filter: blur(3px);
     }
 
@@ -75,11 +75,11 @@
         position: absolute;
         inset: -40%;
         background: conic-gradient(from 180deg,
-                rgba(255, 203, 5, 0.00),
-                rgba(255, 203, 5, 0.18),
-                rgba(13, 110, 253, 0.16),
-                rgba(255, 255, 255, 0.10),
-                rgba(255, 203, 5, 0.00));
+                rgba(7, 185, 206, 0.00),
+                rgba(7, 185, 206, 0.18),
+                rgba(57, 105, 231, 0.16),
+                rgba(125, 42, 231, 0.10),
+                rgba(125, 42, 231, 0.00));
         filter: blur(18px);
         opacity: .75;
         animation: glowSpin 9s linear infinite;
@@ -104,6 +104,7 @@
     }
 
     .pokemon-jumbo-xl__title {
+        color: #F0EEE9; /* color of the year 2026 wokowkwko */
         font-weight: 900;
         font-size: clamp(38px, 4vw, 62px);
         letter-spacing: .6px;
