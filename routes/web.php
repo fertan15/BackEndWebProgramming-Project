@@ -119,7 +119,8 @@ Route::post('/midtrans-notification', [TopUpController::class, 'handleNotificati
 
 //route checkout
 Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
-Route::post('/checkout/process', [CheckoutController::class, 'processPurchase'])->name('checkout.process');
+Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->name('purchase.process');
+
 
 // Admin area
 Route::prefix('admin')->name('admin.')->group(function () {
