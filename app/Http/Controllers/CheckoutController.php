@@ -239,4 +239,16 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Purchase failed: ' . $e->getMessage());
         }
     }
+
+    public function history()
+    {
+        // Get orders for the logged-in user
+        // Eager load 'listing' and 'listing.card' to prevent N+1 queries
+        $orders = OrderItems::where('buyer_id', Auth::id())
+            ->with(['listing.card', 'listing.seller'])
+            ->orderBy('purchased_at', 'desc')
+            ->get();
+
+        return view('orders.index', compact('orders'));
+    }
 }

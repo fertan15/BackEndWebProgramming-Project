@@ -88,6 +88,11 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('orders') }}"> 
+                                    <i class="lni lni-archive"></i> My Orders 
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('chat') }}"> <i class="lni lni-inbox"></i> Messages </a>
                             </li>
                             <li>
