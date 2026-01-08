@@ -84,25 +84,41 @@ class AuthController extends Controller
      */
     public function storeRegisterStep1(Request $request)
     {
-        // // Validate input
-        // $validated = $request->validate([
-        //     'email' => 'required|email|unique:users,email',
-        //     'phone' => 'required|unique:users,phone_number',
-        //     'name' => 'required|string',
-        //     'password' => 'required|min:8'
-        // ]);
+        // Validate input
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'phone' => 'required',
+            'fullname' => 'required|string',
+            'username' => 'required|string',
+            'password' => 'required|min:8'
+        ]);
 
-        // Create temporary user in DB with pending status (not fully verified yet)
+        // Check if email already exists with 'pending' or 'verified' identity_status
+        $existingUser = Users::where('email', $request->input('email'))
+            ->whereIn('identity_status', ['pending', 'verified'])
+            ->first();
+
+        if ($existingUser) {
+            return back()->withErrors(['email' => 'This email is already registered. Please use a different email.'])->withInput();
+        }
+
+        // Check if username is already taken
+        $existingUsername = Users::where('username', $request->input('username'))->first();
+        if ($existingUsername) {
+            return back()->withErrors(['username' => 'This username is already taken. Please choose a different username.'])->withInput();
+        }
+
+        // Create temporary user in DB with unverified status (not fully verified yet)
         $user = Users::create([
-            'username' => $request->input('username'), // Using email as username
+            'username' => $request->input('username'),
             'email' => $request->input('email'),
             'phone_number' => $request->input('phone'),
             'name' => $request->input('fullname'),
             'password_hash' => Hash::make($request->input('password')),
-            'account_status' => 'verify' // Mark as needing verification
+            'account_status' => 'verify', // Mark as needing verification
+            'identity_status' => 'unverified' // Initial identity status
         ]);
         dump("User created with ID: " . $user->id);
-
         // Store user ID in session for the next step
         $request->session()->put('register.user_id', $user->id);
         $request->session()->put('register.phone', $user->phone_number);
@@ -206,10 +222,53 @@ class AuthController extends Controller
             return redirect()->route('register.step1')->with('error', 'User not found.');
         }
 
-        // Handle file uploads for identity verification if needed
-        // For now, mark account as active
+        // Validate identity information
+        $validated = $request->validate([
+            'id_type' => 'required|string|in:driver_license,national_id,passport',
+            'id_number' => 'required|string',
+            'id_document' => 'required|file|mimes:png,jpg,jpeg,pdf|max:10240', // 10MB max
+            'agree_terms' => 'required|accepted'
+        ]);
+
+        // Map form values to database enum values
+        $identityTypeMap = [
+            'driver_license' => 'SIM',
+            'national_id' => 'KTP',
+            'passport' => 'Passport'
+        ];
+
+        $identityType = $identityTypeMap[$request->input('id_type')];
+        $identityNumber = $request->input('id_number');
+
+        // Check if identity number already exists
+        $existingIdentity = Users::where('identity_number', $identityNumber)
+            ->where('id', '!=', $userId)
+            ->first();
+        
+        if ($existingIdentity) {
+            return back()->withErrors(['id_number' => 'This ID number is already registered.'])->withInput();
+        }
+
+        // Handle file upload
+        $imagePath = null;
+        if ($request->hasFile('id_document')) {
+            $file = $request->file('id_document');
+            $fileName = time() . '_' . $userId . '_' . $file->getClientOriginalName();
+            
+            // Store file in public/register directory
+            $file->move(public_path('register'), $fileName);
+            
+            // Store relative path for database
+            $imagePath = 'register/' . $fileName;
+        }
+
+        // Update user with identity information and change status to pending
         Users::where('id', $userId)->update([
-            'account_status' => 'active'
+            'identity_type' => $identityType,
+            'identity_number' => $identityNumber,
+            'identity_image_url' => $imagePath,
+            'identity_status' => 'pending', // Change from unverified to pending
+            'account_status' => 'active' // Mark account as active (identity verification pending)
         ]);
 
         // Log the user in
@@ -222,6 +281,6 @@ class AuthController extends Controller
         // Clear registration data from session upon completion
         $request->session()->forget(['register.email', 'register.phone', 'register.user_id', 'register.otp_verified']);
 
-        return redirect('/home');
+        return redirect('/home')->with('success', 'Registration complete! Your identity verification is pending approval.');
     }
 }
