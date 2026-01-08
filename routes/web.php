@@ -111,8 +111,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
 });
 
+//route top up
+Route::get('/topup', [TopUpController::class, 'show'])->name('topup.show');
+Route::post('/topup/snap', [TopUpController::class, 'getSnapToken'])->name('topup.snap');
+Route::post('/midtrans-notification', [TopUpController::class, 'handleNotification']);
 
 
+//route checkout
+Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
+Route::post('/checkout/process', [CheckoutController::class, 'processPurchase'])->name('checkout.process');
 
 // Admin area
 Route::prefix('admin')->name('admin.')->group(function () {
