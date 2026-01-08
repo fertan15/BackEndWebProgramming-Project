@@ -30,43 +30,27 @@
     const amountInput = document.getElementById('idrAmountDisplay');
     const usdResult = document.getElementById('usdResult');
 
-    // Fungsi untuk memformat angka menjadi ribuan (1.000.000)
-    function formatRupiah(angka) {
-        let number_string = angka.replace(/[^,\d]/g, '').toString(),
-            split = number_string.split(','),
-            sisa = split[0].length % 3,
-            rupiah = split[0].substr(0, sisa),
-            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    // Mencegah input selain angka
+    amountInput.onkeypress = function(e) {
+        if (!/[0-9]/.test(e.key)) e.preventDefault();
+    };
 
-        if (ribuan) {
-            let separator = sisa ? '.' : '';
-            rupiah += separator + ribuan.join('.');
-        }
-
-        return rupiah;
-    }
-
-    // Live update format ribuan dan estimasi USD
+    // Format Rupiah & Live USD
     amountInput.onkeyup = function() {
-        // Simpan angka murni (tanpa titik)
-        let rawValue = this.value.replace(/\./g, '');
-        
-        // Update tampilan input dengan format titik
-        this.value = formatRupiah(this.value);
-        
-        // Update estimasi USD
-        const val = parseFloat(rawValue) || 0;
-        usdResult.innerText = '$' + (val / rate).toFixed(2);
+        let val = this.value.replace(/\./g, '');
+        if (val !== "") {
+            this.value = new Intl.NumberFormat('id-ID').format(val);
+        }
+        const rawValue = parseFloat(val) || 0;
+        usdResult.innerText = '$' + (rawValue / rate).toFixed(2);
     };
 
     document.getElementById('pay-button').onclick = function(e) {
         e.preventDefault();
-        
-        // Ambil nilai asli (hilangkan titik sebelum dikirim ke controller)
-        const idrValue = amountInput.value.replace(/\./g, '');
+        const rawValue = amountInput.value.replace(/\./g, '');
 
-        if (!idrValue || idrValue < 10000) {
-            alert("Minimal top up adalah Rp 10.000");
+        if (rawValue < 10000) {
+            alert("Minimal Top Up Rp 10.000");
             return;
         }
 
@@ -80,33 +64,21 @@
                 "X-CSRF-TOKEN": "{{ csrf_token() }}",
                 "Accept": "application/json"
             },
-            body: JSON.stringify({ amount_idr: idrValue }) // Mengirim angka murni
+            body: JSON.stringify({ amount_idr: rawValue })
         })
-        .then(async r => {
-            const res = await r.json();
-            if (!r.ok) throw new Error(res.error || 'Terjadi kesalahan server');
-            return res;
-        })
+        .then(r => r.json())
         .then(data => {
             if (data.snap_token) {
                 window.snap.pay(data.snap_token, {
                     onSuccess: (result) => { window.location.href = "/home?success=1"; },
-                    onPending: (result) => { window.location.href = "/home?pending=1"; },
-                    onError: (result) => { alert("Pembayaran gagal!"); resetBtn(); },
-                    onClose: () => { alert("Popup ditutup"); resetBtn(); }
+                    onError: (result) => { alert("Gagal!"); location.reload(); },
+                    onClose: () => { location.reload(); }
                 });
+            } else {
+                alert(data.error);
+                location.reload();
             }
-        })
-        .catch(err => {
-            alert(err.message);
-            resetBtn();
         });
-
-        function resetBtn() {
-            const btn = document.getElementById('pay-button');
-            btn.disabled = false;
-            btn.innerText = "Pay Now";
-        }
     };
 </script>
 @endsection

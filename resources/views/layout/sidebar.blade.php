@@ -1,4 +1,3 @@
-<!-- ======== sidebar-nav start =========== -->
 @php
     $notificationUnread = auth()->check()
         ? \App\Models\Notification::where('user_id', auth()->id())->unread()->count()
@@ -11,6 +10,9 @@
             })
             ->count()
         : 0;
+    
+    // Tambahan logika saldo
+    $userBalance = auth()->check() ? auth()->user()->balance : 0;
 @endphp
 
 <aside class="sidebar-nav-wrapper">
@@ -19,8 +21,24 @@
             <img src="{{ asset('images/side_logo') }}" style="width: 100px; height: auto;" />
         </a>
     </div>
+    
     <nav class="sidebar-nav">
         <ul>
+            @auth
+            <li class="nav-item" style="margin: 0 20px 20px 20px; padding: 12px; background: #f8f9fa; border-radius: 10px; border: 1px solid #eee;">
+                <div class="d-flex align-items-center">
+                    <div class="icon" style="color: #2ecc71; margin-right: 10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18V6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V18ZM5 18C5 18.5523 5.44772 19 6 19H18C18.5523 19 19 18.5523 19 18V13H17C15.8954 13 15 12.1046 15 11C15 9.89543 15.8954 9 17 9H19V6C19 5.44772 18.5523 5 18 5H6C5.44772 5 5 5.44772 5 6V18ZM19 11V11H17C17 11.5523 17.4477 12 18 12C18.5523 12 19 11.5523 19 11Z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <small style="display:block; font-size: 10px; color: #888; text-transform: uppercase;">Balance</small>
+                        <strong style="font-size: 15px; color: #333;">${{ number_format($userBalance, 2) }}</strong>
+                    </div>
+                </div>
+            </li>
+            @endauth
             <li class="nav-item">
                 <a href="{{ route('home') }}">
                     <span class="icon">
@@ -97,7 +115,6 @@
                 <span class="text">Create Card</span>
                 </a>
             </li>
-
             @endif
 
             @auth
@@ -110,7 +127,7 @@
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.58172 2 2 5.13401 2 9C2 11.0879 3.06471 12.9604 4.7627 14.2696C4.37842 15.6014 3.54332 16.7875 2.5676 17.7307C2.32075 17.9695 2.30408 18.3582 2.53043 18.617C2.75679 18.8757 3.1404 18.9081 3.4053 18.6907C5.32347 17.1166 6.63763 15.6544 7.50502 14.9055C8.29792 15.0956 9.13381 15.1987 10 15.1987C14.4183 15.1987 18 12.0647 18 8.19873C18 4.33276 14.4183 2 10 2Z" />
                         </svg>
-                    </span>                    
+                    </span>                     
                     <span class="text d-flex align-items-center gap-2">
                         <span>Chat</span>
                         @if($chatUnread > 0)
@@ -125,13 +142,10 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                             <path d="M21 18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18V6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V18ZM5 18C5 18.5523 5.44772 19 6 19H18C18.5523 19 19 18.5523 19 18V13H17C15.8954 13 15 12.1046 15 11C15 9.89543 15.8954 9 17 9H19V6C19 5.44772 18.5523 5 18 5H6C5.44772 5 5 5.44772 5 6V18ZM19 11V11H17C17 11.5523 17.4477 12 18 12C18.5523 12 19 11.5523 19 11Z"/>
                         </svg>
-                    </span>                    
+                    </span>                     
                     <span class="text">Top Up</span>
                 </a>
             </li>
-
-
-            
             @endauth
             
             <span class="divider">
@@ -164,4 +178,5 @@
     </nav>
 </aside>
 <div class="overlay"></div>
-<!-- ======== sidebar-nav end =========== -->
+
+<!-- side bar nav end -->
