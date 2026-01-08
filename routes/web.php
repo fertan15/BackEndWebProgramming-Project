@@ -10,6 +10,7 @@ use App\Http\Controllers\chatController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Otp;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,6 +122,10 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/topup', [TopUpController::class, 'show'])->name('topup.show');
 Route::post('/topup/snap', [TopUpController::class, 'getSnapToken'])->name('topup.snap');
 Route::post('/topup/notification', [TopUpController::class, 'handleNotification']);
+
+//route dashboard
+Route::get('/search', [DashboardController::class, 'search'])->name('search.results');
+
 
 //route checkout
 Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');

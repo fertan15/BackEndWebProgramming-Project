@@ -20,6 +20,7 @@
         object-fit: cover;
     }
 </style>
+
 <header class="header">
     <div class="container-fluid">
         <div class="row">
@@ -31,9 +32,9 @@
                         </button>
                     </div>
                     <div class="header-search d-none d-md-flex">
-                        <form action="#">
-                            <input type="text" placeholder="Search..." />
-                            <button><i class="lni lni-search-alt"></i></button>
+                        <form action="{{ route('search.results') }}" method="GET">
+                            <input type="text" name="query" placeholder="Search..." value="{{ request('query') }}" />
+                            <button type="submit"><i class="lni lni-search-alt"></i></button>
                         </form>
                     </div>
                 </div>
@@ -41,19 +42,16 @@
             <div class="col-lg-7 col-md-7 col-6">
                 <div class="header-right">
                     @auth
-                        <!-- wishlist start -->
                         <div class="wishlist-box ml-15 d-none d-md-flex">
                             <button class="dropdown-toggle" type="button" id="wishlist" data-bs-toggle="dropdown" aria-expanded="false" onclick="location.href='/wishlist'">
                             <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M11.62 18.8101C11.28 18.9301 10.72 18.9301 10.38 18.8101C7.48 17.8201 1 13.6901 1 6.6901C1 3.6001 3.49 1.1001 6.56 1.1001C8.38 1.1001 9.99 1.9801 11 3.3401C12.01 1.9801 13.63 1.1001 15.44 1.1001C18.51 1.1001 21 3.6001 21 6.6901C21 13.6901 14.52 17.8201 11.62 18.8101Z"
-                                    fill="" stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    fill="" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             </button>
                         </div>
-                        <!-- wishlist end -->
-                        <!-- profile start -->
                         <div class="profile-box ml-15">
                             <button class="dropdown-toggle bg-transparent border-0" type="button" id="profile"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -101,36 +99,29 @@
                             </li>
                         </ul>
                     </div>
-
                 @endauth
-
 
                 @guest            
                     <div class="profile-box ml-15">
-                        <button class="dropdown-toggle bg-transparent border-0" type="button" id="profile"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-
-                                <button onclick="location.href='/login'" class="border-0 bg-transparent">
-
-                                    <div class="profile-info text-left">
-                                        <div class="info">
-                                            <div class="image" id="guestAvatar" data-name="Guest" data-image="">
-                                            </div>
-                                            <div>
-                                                <h6 class="fw-500" style="text-align: right;">Log In</h6>
-                                                <p style="text-align: right;">To Continue</p>
-                                            </div>
-                                        </div>
+                        <button onclick="location.href='/login'" class="border-0 bg-transparent">
+                            <div class="profile-info text-left">
+                                <div class="info">
+                                    <div class="image" id="guestAvatar" data-name="Guest" data-image="">
                                     </div>
+                                    <div>
+                                        <h6 class="fw-500" style="text-align: right;">Log In</h6>
+                                        <p style="text-align: right;">To Continue</p>
+                                    </div>
+                                </div>
+                            </div>
                         </button>
                     </div>
-                    <!-- profile end -->
                 @endguest
             </div>
         </div>
     </div>
 </header>
-<!-- ========== header end ========== -->
+
 <script>
     // Get initials from name
     function getInitials(name) {
@@ -157,6 +148,7 @@
 
     // Setup avatar
     function setupTopMenuAvatar(element) {
+        if(!element) return;
         const imageUrl = element.dataset.image;
         const name = element.dataset.name;
         
@@ -166,19 +158,16 @@
                 element.innerHTML = `<img src="${imageUrl}" alt="${name}" />`;
             };
             img.onerror = function() {
-                // Fallback to initials
                 element.style.backgroundColor = getColorForName(name);
                 element.textContent = getInitials(name);
             };
             img.src = imageUrl;
         } else {
-            // No image, use initials
             element.style.backgroundColor = getColorForName(name);
             element.textContent = getInitials(name);
         }
     }
 
-    // Initialize avatars on page load
     document.addEventListener('DOMContentLoaded', function() {
         const topMenuAvatar = document.getElementById('topMenuAvatar');
         if (topMenuAvatar) setupTopMenuAvatar(topMenuAvatar);
