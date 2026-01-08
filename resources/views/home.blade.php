@@ -45,22 +45,24 @@
     </section>
 
     <section class="py-12 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <div class="d-flex justify-content-between align-items-end mb-5">
-                <div>
-                    <span class="text-indigo-600 font-bold tracking-wider text-xs uppercase mb-2 d-block">Marketplace</span>
-                    <h2 class="text-3xl font-extrabold text-gray-900">
-                        Fresh Pulls & Listings
-                    </h2>
-                </div>
-                <a href="{{ route('cards') }}" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm">
-                    View All &rarr;
-                </a>
-            </div>
+        <div class="container"> 
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-end mb-5">
+                        <div>
+                            <span class="text-primary fw-bold text-uppercase mb-2 d-block" style="font-size: 0.75rem; letter-spacing: 0.05em;">Marketplace</span>
+                            <h2 class="h3 fw-extrabold text-dark">Fresh Pulls & Listings</h2>
+                        </div>
+                        <a href="{{ route('cards') }}" class="btn btn-link text-decoration-none fw-semibold">
+                            View All &rarr;
+                        </a>
+                    </div>
 
-            {{-- This container will be updated by AJAX --}}
-            <div id="latest-listings-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                @include('partials.listing_cards', ['listings' => $latestListings])
+                    {{-- ini ajaxnya yang ngerefresh tiap 30 detik --}}
+                    <div id="latest-listings-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full justify-center justify-items-center">
+                        @include('partials.listing_cards', ['listings' => $latestListings])
+                    </div>
+                </div>
             </div>
         </div>
     </section>
