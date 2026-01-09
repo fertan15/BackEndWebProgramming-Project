@@ -9,9 +9,15 @@
                     
                     <div class="col-md-5 p-4 p-lg-5 bg-white">
                         <div class="mb-4">
-                            <a href="{{ url('/cards') }}" class="btn btn-sm btn-light rounded-pill px-3">
-                                <i class="lni lni-arrow-left"></i> Back to Market
-                            </a>
+                            @if(isset($listing))
+                                <a href="{{ url()->previous() }}" class="btn btn-sm btn-light rounded-pill px-3">
+                                    <i class="lni lni-arrow-left"></i> Back
+                                </a>
+                            @else
+                                <a href="{{ url('/cards') }}" class="btn btn-sm btn-light rounded-pill px-3">
+                                    <i class="lni lni-arrow-left"></i> Back to Market
+                                </a>
+                            @endif
                         </div>
 
                         <div class="mb-4">
@@ -24,9 +30,15 @@
                             <div class="d-flex justify-content-between mb-3">
                                 <span class="text-secondary">Item Price</span>
                                 <span class="fw-bold">
-                                    {{ $currencySymbol }}{{ number_format((float)$card->estimated_market_price, 2, ',', '.') }}
+                                    {{ $currencySymbol }}{{ isset($listing) ? number_format((float)$listing->price, 2, ',', '.') : number_format((float)$card->estimated_market_price, 2, ',', '.') }}
                                 </span>
                             </div>
+                            @if(isset($quantity) && $quantity > 1)
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-secondary">Quantity</span>
+                                    <span class="fw-bold">{{ $quantity }}</span>
+                                </div>
+                            @endif
                             <div class="d-flex justify-content-between mb-3">
                                 <span class="text-secondary">Platform Fee</span>
                                 <span class="text-success fw-bold">Free</span>
@@ -35,14 +47,14 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="h5 mb-0 fw-bold">Total Amount</span>
                                 <span class="h3 mb-0 fw-bolder text-primary">
-                                    {{ $currencySymbol }}{{ number_format((float)$card->estimated_market_price, 2, ',', '.') }}
+                                    {{ $currencySymbol }}{{ isset($totalPrice) ? number_format((float)$totalPrice, 2, ',', '.') : (isset($listing) ? number_format((float)$listing->price, 2, ',', '.') : number_format((float)$card->estimated_market_price, 2, ',', '.')) }}
                                 </span>
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center p-3 mb-4 rounded-3 border {{ $currentUser->balance >= $card->estimated_market_price ? 'border-success-subtle bg-success-light' : 'border-danger-subtle bg-danger-light' }}">
+                        <div class="d-flex align-items-center p-3 mb-4 rounded-3 border {{ $currentUser->balance >= (isset($totalPrice) ? $totalPrice : (isset($listing) ? $listing->price : $card->estimated_market_price)) ? 'border-success-subtle bg-success-light' : 'border-danger-subtle bg-danger-light' }}">
                             <div class="flex-shrink-0">
-                                <i class="lni lni-wallet h4 mb-0 {{ $currentUser->balance >= $card->estimated_market_price ? 'text-success' : 'text-danger' }}"></i>
+                                <i class="lni lni-wallet h4 mb-0 {{ $currentUser->balance >= (isset($totalPrice) ? $totalPrice : (isset($listing) ? $listing->price : $card->estimated_market_price)) ? 'text-success' : 'text-danger' }}"></i>
                             </div>
                             <div class="flex-grow-1 ms-3">
                                 <p class="small mb-0 text-muted">Your Current Balance</p>
@@ -52,19 +64,33 @@
                             </div>
                         </div>
 
-                        @if($currentUser->balance >= $card->estimated_market_price)
-                            <form action="{{ route('purchase.process') }}" method="POST" onsubmit="return confirmPurchase()">
-                                @csrf
-                                <input type="hidden" name="card_id" value="{{ $card->id }}">
-                                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 shadow fw-bold rounded-pill">
-                                    Complete Purchase
-                                </button>
-                            </form>
+                        @php
+                            $requiredAmount = isset($totalPrice) ? $totalPrice : (isset($listing) ? $listing->price : $card->estimated_market_price);
+                        @endphp
+
+                        @if($currentUser->balance >= $requiredAmount)
+                            @if(isset($listing))
+                                <form id="checkoutForm" method="POST" action="{{ route('buy.listing', $listing->id) }}" onsubmit="return confirmPurchase()">
+                                    @csrf
+                                    <input type="hidden" name="quantity" value="{{ $quantity ?? 1 }}">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 shadow fw-bold rounded-pill">
+                                        Complete Purchase
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('purchase.process') }}" method="POST" onsubmit="return confirmPurchase()">
+                                    @csrf
+                                    <input type="hidden" name="card_id" value="{{ $card->id }}">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 shadow fw-bold rounded-pill">
+                                        Complete Purchase
+                                    </button>
+                                </form>
+                            @endif
                         @else
                             <div class="alert alert-danger rounded-4 border-0 mb-3">
                                 <small>
                                     <strong>Insufficient Funds:</strong> 
-                                    You need {{ $currencySymbol }}{{ number_format((float)$card->estimated_market_price - (float)$currentUser->balance, 2, ',', '.') }} more.
+                                    You need {{ $currencySymbol }}{{ number_format((float)$requiredAmount - (float)$currentUser->balance, 2, ',', '.') }} more.
                                 </small>
                             </div>
                             <a href="{{ url('/topup') }}" class="btn btn-dark btn-lg w-100 py-3 rounded-pill fw-bold">
@@ -86,7 +112,7 @@
 
                         <div class="text-center position-relative" style="z-index: 2;">
                             <div class="card-glow"></div>
-                            <img src="{{ $card->image_url }}" 
+                            <img src="{{ asset($card->image_url) }}" 
                                  alt="{{ $card->name }}" 
                                  class="img-fluid floating-card shadow-lg" 
                                  style="max-height: 500px; border-radius: 15px;">
@@ -98,7 +124,7 @@
                         </div>
                     </div>
 
-                </div>
+                  </div>
             </div>
         </div>
     </div>
@@ -138,9 +164,122 @@
 
 <script>
 function confirmPurchase() {
-     // Updated to show decimals in the alert
-     let price = "{{ number_format((float)$card->estimated_market_price, 2, ',', '.') }}";
-     return confirm("Confirm purchase of {{ $card->name }} for {{ $currencySymbol }}" + price + "?");
+}
+
+// Handle form submission with notification
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkoutForm');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            
+            // Confirm purchase first
+            @if(isset($listing))
+                let price = "{{ number_format((float)$listing->price, 2, ',', '.') }}";
+                let quantity = "{{ $quantity ?? 1 }}";
+                let confirmMsg = "Confirm purchase of " + quantity + "x {{ $card->name }} for {{ $currencySymbol }}" + price + "?";
+            @else
+                let price = "{{ number_format((float)$card->estimated_market_price, 2, ',', '.') }}";
+                let confirmMsg = "Confirm purchase of {{ $card->name }} for {{ $currencySymbol }}" + price + "?";
+            @endif
+            
+            if (confirm(confirmMsg)) {
+                // Submit the form
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json().catch(() => ({ success: true })))
+                .then(data => {
+                    // Show success notification
+                    showSuccessNotification('✓ Purchase Successful!', 'Your card has been added to your inventory.');
+                    
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        @if(isset($listing))
+                            window.location.href = '{{ route("card.detail", $card->id) }}';
+                        @else
+                            window.location.href = '/home';
+                        @endif
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorNotification('Purchase Failed', 'An error occurred. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+            } else {
+                // User cancelled the confirmation
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+    }
+});
+
+// Success notification function
+function showSuccessNotification(title, message) {
+    const notificationHTML = `
+        <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 350px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <div class="d-flex align-items-center">
+                <i class="lni lni-checkmark-circle me-2" style="font-size: 1.5rem;"></i>
+                <div>
+                    <strong>${title}</strong>
+                    <p class="mb-0 small">${message}</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('afterbegin', notificationHTML);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert-success');
+        alerts.forEach(alert => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 150);
+        });
+    }, 5000);
+}
+
+// Error notification function
+function showErrorNotification(title, message) {
+    const notificationHTML = `
+        <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 350px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <div class="d-flex align-items-center">
+                <i class="lni lni-close-circle me-2" style="font-size: 1.5rem;"></i>
+                <div>
+                    <strong>${title}</strong>
+                    <p class="mb-0 small">${message}</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('afterbegin', notificationHTML);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert-danger');
+        alerts.forEach(alert => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 150);
+        });
+    }, 5000);
 }
 </script>
 @endsection

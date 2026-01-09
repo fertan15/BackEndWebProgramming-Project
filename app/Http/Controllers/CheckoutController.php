@@ -8,6 +8,7 @@ use App\Models\Listings;
 use App\Models\OrderItems;
 use App\Models\UserCollections;
 use App\Models\WalletTransactions;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,52 @@ class CheckoutController extends Controller
             'card' => $card,
             'currentUser' => $user,
             'currencySymbol' => '$ '
+        ]);
+    }
+
+    public function showCheckoutListing(Request $request, $listingId)
+    {
+        if (!Auth::check()) {
+            return redirect('/login')->with('error', 'Please login first.');
+        }
+
+        // Require identity verification to access checkout
+        $currentUser = Auth::user();
+        if ($currentUser && $currentUser->identity_status !== 'verified') {
+            $message = 'Identity verification is required to buy cards.';
+            if ($currentUser->identity_status === 'unverified') {
+                $message = 'Please verify your identity before you can buy cards.';
+            } elseif ($currentUser->identity_status === 'pending') {
+                $message = 'Your identity verification is pending approval. You can buy cards once verified.';
+            } elseif ($currentUser->identity_status === 'rejected') {
+                $message = 'Your identity verification was rejected. Please resubmit your documents.';
+            }
+            return redirect('/home')->with('warning', $message);
+        }
+
+        $listing = Listings::find($listingId);
+        if (!$listing) {
+            return redirect('/cards')->with('error', 'Listing not found.');
+        }
+
+        if (!$listing->is_active || $listing->quantity <= 0) {
+            return redirect('/cards')->with('error', 'This listing is no longer available.');
+        }
+
+        $card = $listing->card;
+        if (!$card) {
+            return redirect('/cards')->with('error', 'Card not found.');
+        }
+
+        $user = $currentUser;
+
+        return view('checkout', [
+            'card' => $card,
+            'listing' => $listing,
+            'currentUser' => $user,
+            'currencySymbol' => '$ ',
+            'quantity' => 1,
+            'totalPrice' => $listing->price
         ]);
     }
 
@@ -86,6 +133,16 @@ class CheckoutController extends Controller
                     ->update(['balance' => $newBalance]);
 
                 $user->balance = $newBalance;
+                
+                // Create notification for successful purchase
+                Notification::create([
+                    'user_id' => $user->id,
+                    'type' => 'PURCHASE',
+                    'title' => '✓ Purchase Successful',
+                    'message' => 'You have successfully purchased ' . $card->name . ' for $' . number_format($card->estimated_market_price, 2),
+                    'action_url' => route('inventory.index'),
+                    'is_read' => false,
+                ]);
             });
 
             return redirect('/home')->with('success', 'Purchase successful! Remaining: Rp ' . number_format($user->balance, 0, ',', '.'));
@@ -264,6 +321,28 @@ class CheckoutController extends Controller
                         ->where('card_id', $listing->card_id)
                         ->where('is_listed', true)
                         ->update(['is_listed' => false]);
+                }
+                
+                // Create notification for buyer
+                Notification::create([
+                    'user_id' => $userId,
+                    'type' => 'PURCHASE',
+                    'title' => '✓ Purchase Successful',
+                    'message' => 'You have successfully purchased ' . $quantity . 'x ' . $listing->card->name . ' for $' . number_format($totalPrice, 2),
+                    'action_url' => route('inventory.index'),
+                    'is_read' => false,
+                ]);
+                
+                // Create notification for seller
+                if ($seller) {
+                    Notification::create([
+                        'user_id' => $seller->id,
+                        'type' => 'SALES',
+                        'title' => '✓ Item Sold',
+                        'message' => $user->username . ' has purchased ' . $quantity . 'x ' . $listing->card->name . ' for $' . number_format($totalPrice, 2),
+                        'action_url' => route('history'),
+                        'is_read' => false,
+                    ]);
                 }
             });
 

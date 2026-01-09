@@ -137,6 +137,7 @@ Route::get('/search', [DashboardController::class, 'search'])->name('search.resu
 
 //route checkout
 Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->middleware('verified.transaction')->name('checkout.show');
+Route::get('/checkout/listing/{listingId}', [CheckoutController::class, 'showCheckoutListing'])->middleware('verified.transaction')->name('checkout.listing');
 Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->middleware('verified.transaction')->name('purchase.process');
 Route::post('/buy-listing/{listingId}', [CheckoutController::class, 'buyListing'])->middleware('verified.transaction')->name('buy.listing');
 Route::post('/cancel-listing/{listingId}', [CardController::class, 'cancelListing'])->name('cancel.listing');

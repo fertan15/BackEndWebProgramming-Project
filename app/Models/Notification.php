@@ -69,6 +69,8 @@ class Notification extends Model
     public function getIconAttribute(): string
     {
         return match($this->type) {
+            'PURCHASE' => 'lni-check-circle',
+            'SALES' => 'lni-cart-full',
             'order' => 'lni-cart',
             'message' => 'lni-envelope',
             'listing' => 'lni-package',
@@ -84,6 +86,8 @@ class Notification extends Model
     public function getColorAttribute(): string
     {
         return match($this->type) {
+            'PURCHASE' => '#10B981',
+            'SALES' => '#8B5CF6',
             'order' => '#4ECDC4',
             'message' => '#45B7D1',
             'listing' => '#F7DC6F',

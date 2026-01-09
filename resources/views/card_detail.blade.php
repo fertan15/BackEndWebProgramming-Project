@@ -176,9 +176,9 @@
                                                                 </button>
                                                             </form>
                                                         @else
-                                                            <button class="btn btn-sm btn-primary buy-btn" data-listing-id="{{ $listing->id }}" data-card-name="{{ $card->name }}" data-price="{{ $listing->price }}" data-quantity="{{ $listing->quantity }}">
+                                                            <a href="{{ route('checkout.listing', ['listingId' => $listing->id]) }}" class="btn btn-sm btn-primary">
                                                                 Buy
-                                                            </button>
+                                                            </a>
                                                         @endif
                                                     </td>
                                                 </tr>
