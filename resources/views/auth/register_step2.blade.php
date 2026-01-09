@@ -56,7 +56,7 @@
             <!-- Hidden input for combined OTP value (will be populated by JS) -->
             <input type="hidden" name="otp_code" id="otp-code-hidden">
         </div>
-        <button type="button" id="btn-resend" onclick="startResendTimer()" class="w-full text-sm text-center text-indigo-600 font-semibold mb-6 hover:text-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Resend Code</button>
+        <button type="button" id="btn-resend" onclick="startResendTimer()" class="w-full text-sm text-center text-indigo-600 font-semibold mb-6 hover:text-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Send Code</button>
         <div class="flex space-x-4">
             <a href="{{ url('/register/step1') }}"
                class="flex-1 text-center py-3 px-4 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition duration-150 shadow-sm">
