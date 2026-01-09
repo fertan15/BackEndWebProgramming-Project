@@ -24,7 +24,91 @@ class HomeController extends Controller
             ->take(4)
             ->get();
 
-        return view('home', compact('latestListings', 'user_id', 'user_name'));
+        // Get statistics for reports
+        // Top seller by revenue
+        $topSeller = OrderItems::selectRaw('listings.seller_id, users.name, users.username, SUM(order_items.price_at_purchase * order_items.quantity) as total_revenue')
+            ->join('listings', 'order_items.listing_id', '=', 'listings.id')
+            ->join('users', 'listings.seller_id', '=', 'users.id')
+            ->groupBy('listings.seller_id', 'users.name', 'users.username')
+            ->orderByDesc('total_revenue')
+            ->first();
+
+        // Top buyer by total spent
+        $topBuyer = OrderItems::selectRaw('buyer_id, users.name, users.username, SUM(price_at_purchase * quantity) as total_spent')
+            ->join('users', 'order_items.buyer_id', '=', 'users.id')
+            ->groupBy('buyer_id', 'users.name', 'users.username')
+            ->orderByDesc('total_spent')
+            ->first();
+
+        // Most traded card
+        $mostTradedCard = OrderItems::selectRaw('listings.card_id, cards.name, cards.image_url, SUM(order_items.quantity) as total_traded')
+            ->join('listings', 'order_items.listing_id', '=', 'listings.id')
+            ->join('cards', 'listings.card_id', '=', 'cards.id')
+            ->groupBy('listings.card_id', 'cards.name', 'cards.image_url')
+            ->orderByDesc('total_traded')
+            ->first();
+
+        // Total platform revenue (all transactions)
+        $totalRevenue = OrderItems::selectRaw('SUM(price_at_purchase * quantity) as total')
+            ->value('total') ?? 0;
+
+        // Total number of transactions
+        $totalTransactions = OrderItems::count();
+
+        // Active listings count
+        $activeListings = Listings::where('is_active', true)->count();
+
+        // User's own analytics (if logged in)
+        $userStats = null;
+        if ($user_id) {
+            // User's total sales revenue
+            $userSalesRevenue = OrderItems::whereHas('listing', function($q) use ($user_id) {
+                    $q->where('seller_id', $user_id);
+                })
+                ->selectRaw('SUM(price_at_purchase * quantity) as total')
+                ->value('total') ?? 0;
+
+            // User's total purchases spent
+            $userPurchasesSpent = OrderItems::where('buyer_id', $user_id)
+                ->selectRaw('SUM(price_at_purchase * quantity) as total')
+                ->value('total') ?? 0;
+
+            // User's active listings
+            $userActiveListings = Listings::where('seller_id', $user_id)
+                ->where('is_active', true)
+                ->count();
+
+            // User's total sales count
+            $userTotalSales = OrderItems::whereHas('listing', function($q) use ($user_id) {
+                    $q->where('seller_id', $user_id);
+                })
+                ->count();
+
+            // User's total purchases count
+            $userTotalPurchases = OrderItems::where('buyer_id', $user_id)->count();
+
+            // User's most sold card
+            $userMostSoldCard = OrderItems::whereHas('listing', function($q) use ($user_id) {
+                    $q->where('seller_id', $user_id);
+                })
+                ->selectRaw('listings.card_id, cards.name, cards.image_url, SUM(order_items.quantity) as total_sold')
+                ->join('listings', 'order_items.listing_id', '=', 'listings.id')
+                ->join('cards', 'listings.card_id', '=', 'cards.id')
+                ->groupBy('listings.card_id', 'cards.name', 'cards.image_url')
+                ->orderByDesc('total_sold')
+                ->first();
+
+            $userStats = [
+                'salesRevenue' => $userSalesRevenue,
+                'purchasesSpent' => $userPurchasesSpent,
+                'activeListings' => $userActiveListings,
+                'totalSales' => $userTotalSales,
+                'totalPurchases' => $userTotalPurchases,
+                'mostSoldCard' => $userMostSoldCard,
+            ];
+        }
+
+        return view('home', compact('latestListings', 'user_id', 'user_name', 'topSeller', 'topBuyer', 'mostTradedCard', 'totalRevenue', 'totalTransactions', 'activeListings', 'userStats'));
 
     }
 

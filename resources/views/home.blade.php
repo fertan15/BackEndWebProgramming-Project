@@ -51,6 +51,7 @@
         </div>
     </section>
 
+    {{-- Marketplace Section --}}
     <section class="py-12 bg-gray-50">
         <div class="container"> 
             <div class="row">
@@ -73,6 +74,285 @@
             </div>
         </div>
     </section>
+
+    {{-- Platform Statistics Section --}}
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <span class="text-primary fw-bold text-uppercase mb-2 d-block" style="font-size: 0.75rem; letter-spacing: 0.05em;">Platform Analytics</span>
+                    <h2 class="h3 fw-extrabold text-dark">Platform Statistics</h2>
+                    <p class="text-muted">Real-time insights from our marketplace</p>
+                </div>
+            </div>
+
+            {{-- Overview Stats Cards --}}
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-dollar" style="font-size: 2.5rem; color: #28a745;"></i>
+                            </div>
+                            <h3 class="fw-bold text-success mb-2">${{ number_format($totalRevenue, 2) }}</h3>
+                            <p class="text-muted mb-0">Total Platform Revenue</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-cart" style="font-size: 2.5rem; color: #17a2b8;"></i>
+                            </div>
+                            <h3 class="fw-bold text-info mb-2">{{ number_format($totalTransactions) }}</h3>
+                            <p class="text-muted mb-0">Total Transactions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-list" style="font-size: 2.5rem; color: #ffc107;"></i>
+                            </div>
+                            <h3 class="fw-bold text-warning mb-2">{{ number_format($activeListings) }}</h3>
+                            <p class="text-muted mb-0">Active Listings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Top Performers --}}
+            <div class="row g-4">
+                {{-- Top Seller --}}
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-gradient-success text-white border-0">
+                            <h5 class="mb-0">
+                                <i class="lni lni-crown"></i> Top Seller
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if($topSeller)
+                                <div class="text-center">
+                                    <div class="mb-3">
+                                        <div class="avatar-circle mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                                            {{ strtoupper(substr($topSeller->name, 0, 2)) }}
+                                        </div>
+                                    </div>
+                                    <h5 class="fw-bold mb-1">{{ $topSeller->name }}</h5>
+                                    <p class="text-muted small mb-3">@<span>{{ $topSeller->username }}</span></p>
+                                    <div class="bg-light rounded p-3">
+                                        <p class="text-muted small mb-1">Total Revenue</p>
+                                        <h4 class="fw-bold text-success mb-0">${{ number_format($topSeller->total_revenue, 2) }}</h4>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center text-muted py-4">
+                                    <p>No sales data yet</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Top Buyer --}}
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-gradient-primary text-white border-0">
+                            <h5 class="mb-0">
+                                <i class="lni lni-shopping-basket"></i> Top Buyer
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if($topBuyer)
+                                <div class="text-center">
+                                    <div class="mb-3">
+                                        <div class="avatar-circle mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                                            {{ strtoupper(substr($topBuyer->name, 0, 2)) }}
+                                        </div>
+                                    </div>
+                                    <h5 class="fw-bold mb-1">{{ $topBuyer->name }}</h5>
+                                    <p class="text-muted small mb-3">@<span>{{ $topBuyer->username }}</span></p>
+                                    <div class="bg-light rounded p-3">
+                                        <p class="text-muted small mb-1">Total Spent</p>
+                                        <h4 class="fw-bold text-primary mb-0">${{ number_format($topBuyer->total_spent, 2) }}</h4>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center text-muted py-4">
+                                    <p>No purchase data yet</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Most Traded Card --}}
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-gradient-warning text-white border-0">
+                            <h5 class="mb-0">
+                                <i class="lni lni-star-filled"></i> Most Traded Card
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if($mostTradedCard)
+                                <div class="text-center">
+                                    <div class="mb-3">
+                                        <img src="{{ asset($mostTradedCard->image_url) }}" alt="{{ $mostTradedCard->name }}" class="img-fluid rounded shadow-sm" style="max-height: 150px; object-fit: contain;">
+                                    </div>
+                                    <h5 class="fw-bold mb-2">{{ $mostTradedCard->name }}</h5>
+                                    <div class="bg-light rounded p-3">
+                                        <p class="text-muted small mb-1">Total Traded</p>
+                                        <h4 class="fw-bold text-warning mb-0">{{ number_format($mostTradedCard->total_traded) }} <span class="small">units</span></h4>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center text-muted py-4">
+                                    <p>No trading data yet</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- User's Personal Analytics Section --}}
+    @if($userStats)
+    <section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-12 text-white">
+                    <span class="fw-bold text-uppercase mb-2 d-block" style="font-size: 0.75rem; letter-spacing: 0.05em; opacity: 0.9;">Your Analytics</span>
+                    <h2 class="h3 fw-extrabold">Your Trading Performance</h2>
+                    <p class="mb-0" style="opacity: 0.9;">Track your buying and selling activity</p>
+                </div>
+            </div>
+
+            {{-- User Stats Cards --}}
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-revenue" style="font-size: 2rem; color: #28a745;"></i>
+                            </div>
+                            <h4 class="fw-bold text-success mb-1">${{ number_format($userStats['salesRevenue'], 2) }}</h4>
+                            <p class="text-muted small mb-0">Sales Revenue</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-wallet" style="font-size: 2rem; color: #dc3545;"></i>
+                            </div>
+                            <h4 class="fw-bold text-danger mb-1">${{ number_format($userStats['purchasesSpent'], 2) }}</h4>
+                            <p class="text-muted small mb-0">Total Spent</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-package" style="font-size: 2rem; color: #ffc107;"></i>
+                            </div>
+                            <h4 class="fw-bold text-warning mb-1">{{ number_format($userStats['activeListings']) }}</h4>
+                            <p class="text-muted small mb-0">Active Listings</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="lni lni-stats-up" style="font-size: 2rem; color: #17a2b8;"></i>
+                            </div>
+                            <h4 class="fw-bold text-info mb-1">{{ number_format($userStats['totalSales'] + $userStats['totalPurchases']) }}</h4>
+                            <p class="text-muted small mb-0">Total Transactions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- User Activity Details --}}
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="lni lni-shopping-basket text-primary"></i> Buying Activity
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                <span class="text-muted">Total Purchases</span>
+                                <span class="fw-bold">{{ number_format($userStats['totalPurchases']) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Total Amount Spent</span>
+                                <span class="fw-bold text-danger">${{ number_format($userStats['purchasesSpent'], 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow h-100">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="lni lni-revenue text-success"></i> Selling Activity
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                                <span class="text-muted">Total Sales</span>
+                                <span class="fw-bold">{{ number_format($userStats['totalSales']) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Total Revenue</span>
+                                <span class="fw-bold text-success">${{ number_format($userStats['salesRevenue'], 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- User's Most Sold Card --}}
+            @if($userStats['mostSoldCard'])
+            <div class="row g-4 mt-2">
+                <div class="col-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-4">
+                                <i class="lni lni-star-filled text-warning"></i> Your Best Seller
+                            </h5>
+                            <div class="row align-items-center">
+                                <div class="col-md-3 text-center">
+                                    <img src="{{ asset($userStats['mostSoldCard']->image_url) }}" alt="{{ $userStats['mostSoldCard']->name }}" class="img-fluid rounded shadow-sm" style="max-height: 200px; object-fit: contain;">
+                                </div>
+                                <div class="col-md-9">
+                                    <h4 class="fw-bold mb-2">{{ $userStats['mostSoldCard']->name }}</h4>
+                                    <p class="text-muted mb-3">This is your most sold card</p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="bg-light rounded p-3">
+                                                <p class="text-muted small mb-1">Units Sold</p>
+                                                <h3 class="fw-bold text-primary mb-0">{{ number_format($userStats['mostSoldCard']->total_sold) }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+        </div>
+    </section>
+    @endif
 
 @endsection
 
