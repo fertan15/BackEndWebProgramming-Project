@@ -102,9 +102,9 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'This email is already registered. Please use a different email.'])->withInput();
         }
 
-        // Check if email exists with 'unverified' status
+        // Check if email exists with 'unverified' or 'rejected' status
         $unverifiedUser = Users::where('email', $request->input('email'))
-            ->where('identity_status', 'unverified')
+            ->whereIn('identity_status', ['unverified', 'rejected'])
             ->first();
 
         if ($unverifiedUser) {
@@ -112,6 +112,16 @@ class AuthController extends Controller
             if (Hash::check($request->input('password'), $unverifiedUser->password_hash)) {
                 // Password matches - allow them to continue registration
                 $user = $unverifiedUser;
+                
+                // If rejected, skip to step 3 to resubmit documents
+                if ($user->identity_status === 'rejected') {
+                    $request->session()->put('register.user_id', $user->id);
+                    $request->session()->put('register.phone', $user->phone_number);
+                    $request->session()->put('register.email', $user->email);
+                    $request->session()->put('register.name', $user->name);
+                    $request->session()->put('register.otp_verified', true); // Skip OTP for rejected users
+                    return redirect()->route('register.step3')->with('info', 'Your identity was rejected. Please resubmit your documents.');
+                }
             } else {
                 // Password doesn't match - email is already in use
                 return back()->withErrors(['email' => 'This email has already been used. Please use a different email.'])->withInput();
@@ -214,13 +224,23 @@ class AuthController extends Controller
     public function showRegisterStep3()
     {
         // Check if OTP was verified
-        if(Auth::user()->account_status === 'active'){
-            if(Auth::user()->identity_status === 'verified'){
-                return redirect('/home');
-            }
-        }
-        else if (!session('register.otp_verified')) {
+        if (!session('register.otp_verified')) {
             return redirect()->route('register.step2')->with('error', 'Please verify OTP first.');
+        }
+        
+        $userId = session('register.user_id');
+        if (!$userId) {
+            return redirect()->route('register.step1')->with('error', 'Session expired.');
+        }
+
+        $user = Users::find($userId);
+        if (!$user) {
+            return redirect()->route('register.step1')->with('error', 'User not found.');
+        }
+
+        // If identity already verified, redirect to home
+        if ($user->identity_status === 'verified') {
+            return redirect('/home');
         }
         
         return view('auth.register_step3');

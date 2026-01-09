@@ -35,6 +35,17 @@
         </p>
     </div>
 
+    @if ($errors->any())
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+            <p class="text-sm font-semibold text-red-600 mb-2">❌ Error:</p>
+            <ul class="text-sm text-red-700 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('register.complete') }}" enctype="multipart/form-data">
         @csrf
         
@@ -78,9 +89,12 @@
                     <input type="checkbox" name="agree_terms" required class="mt-1 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                     <span>I agree to PocketRader's <a href="#" class="text-indigo-600 hover:underline font-semibold">Terms of Service</a> and <a href="#" class="text-indigo-600 hover:underline font-semibold">Privacy Policy</a></span>
                 </label>
-            </div>8">
+            </div>
+        </div>
+
+        <div class="flex gap-4 mt-6">
             <a href="{{ url('/register/step2') }}"
-               class="flex-1 text-center py-3 px-4 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition duration-150 shadow-sm">
+               class="flex-1 text-center py-5 px-4 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition duration-150 shadow-sm">
                 Back
             </a>
             <button type="submit"

@@ -112,7 +112,7 @@ class AdminController extends Controller
     {
         $user = Users::findOrFail($id);
 
-        $user->identity_status = 'approved';
+        $user->identity_status = 'verified';
         $user->account_status = 'active';
         $user->save();
 
