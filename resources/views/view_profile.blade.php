@@ -172,7 +172,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="input-style-1">
-                                        <label>Identity Image URL</label>
+                                        <label>Profile Picture URL</label>
                                              <input class="editable-field" type="url" name="identity_image_url" id="identityImageUrl" 
                                                  placeholder="Enter image URL (https://...)" 
                                                  value="{{ old('identity_image_url', $user ? $user->identity_image_url : '') }}" readonly>

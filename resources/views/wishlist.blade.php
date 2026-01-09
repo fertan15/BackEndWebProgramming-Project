@@ -76,8 +76,6 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="btn-group-wrapper d-flex gap-1">
                                             <a href="{{ route('card.detail', $item->card->id) }}" class="btn btn-info btn-sm text-white">Details</a>
-                                            
-                                            <a href="#" class="btn btn-primary btn-sm">Trade</a>
                                         </div>
 
                                         <form action="{{ route('wishlist.toggle', $item->card->id) }}" method="POST" style="display: inline;" class="wishlist-remove-form">
