@@ -154,6 +154,12 @@ class AdminController extends Controller
     public function banUser($id)
     {
         $user = Users::findOrFail($id);
+        
+        // Prevent admin from banning themselves
+        $currentUserId = session('user_id');
+        if ($user->id == $currentUserId) {
+            return redirect()->route('admin.users')->with('error', 'You cannot ban yourself.');
+        }
 
         if ($user->account_status === 'banned') {
             // Unban the user

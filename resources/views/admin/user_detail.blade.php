@@ -224,19 +224,25 @@
                         <div class="title mb-20">
                             <h6>Admin Actions</h6>
                         </div>
-                        <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ $user->account_status === 'banned' ? 'Are you sure you want to unban this user?' : 'Are you sure you want to ban this user?' }}');">
-                            @csrf
-                            @method('PUT')
-                            @if($user->account_status === 'banned')
-                                <button type="submit" class="btn btn-outline-success">
-                                    <i class="lni lni-check-circle"></i> Unban User
-                                </button>
-                            @else
-                                <button type="submit" class="btn btn-outline-danger">
-                                    <i class="lni lni-close-circle"></i> Ban User
-                                </button>
-                            @endif
-                        </form>
+                        @if($user->id != session('user_id'))
+                            <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ $user->account_status === 'banned' ? 'Are you sure you want to unban this user?' : 'Are you sure you want to ban this user?' }}');">
+                                @csrf
+                                @method('PUT')
+                                @if($user->account_status === 'banned')
+                                    <button type="submit" class="btn btn-outline-success">
+                                        <i class="lni lni-check-circle"></i> Unban User
+                                    </button>
+                                @else
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="lni lni-close-circle"></i> Ban User
+                                    </button>
+                                @endif
+                            </form>
+                        @else
+                            <div class="alert alert-info">
+                                <i class="lni lni-information"></i> You cannot ban yourself.
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
