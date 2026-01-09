@@ -123,8 +123,18 @@ class AdminController extends Controller
     {
         $user = Users::findOrFail($id);
 
+        // Delete the identity image file if it exists
+        if ($user->identity_image_url) {
+            $imagePath = public_path($user->identity_image_url);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
+        // Update user status and clear identity information
         $user->identity_status = 'rejected';
         $user->account_status = $user->account_status ?: 'verify';
+        $user->identity_image_url = null; // Clear the image path from database
         $user->save();
 
         return redirect()->route('admin.requests')->with('success', 'User verification rejected.');

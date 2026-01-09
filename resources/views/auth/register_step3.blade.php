@@ -35,6 +35,18 @@
         </p>
     </div>
 
+    @if (session('info'))
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+            <p class="text-sm text-blue-700"><span class="font-semibold">ℹ️ Info:</span> {{ session('info') }}</p>
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div class="p-4 bg-green-50 border border-green-200 rounded-lg mb-6">
+            <p class="text-sm text-green-700"><span class="font-semibold">✅ Success:</span> {{ session('success') }}</p>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div class="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
             <p class="text-sm font-semibold text-red-600 mb-2">❌ Error:</p>

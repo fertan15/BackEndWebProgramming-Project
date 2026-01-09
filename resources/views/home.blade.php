@@ -1,6 +1,13 @@
 @extends('layout.main')
 
 @section('main_contents')
+    @if (session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin: 20px auto; max-width: 1200px;">
+            <strong>⚠️ Warning:</strong> {{ session('warning') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <section class="section" style="width: 100%;">
         <div class="container-fluid">
             <div class="row">

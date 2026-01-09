@@ -68,6 +68,11 @@ class AuthController extends Controller
         $request->session()->put('user_name', $user->name);
         $request->session()->put('is_admin', (bool) $user->is_admin);
 
+        // Check if user's identity was rejected and notify them
+        if ($user->identity_status === 'rejected') {
+            return redirect('/home')->with('warning', 'Your identity verification was rejected. Please resubmit your documents in your profile.');
+        }
+
         return redirect('/home');
     }
     /**

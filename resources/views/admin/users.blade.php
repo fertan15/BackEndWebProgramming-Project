@@ -84,8 +84,12 @@
                                 </td>
                                 <td>{{ optional($user->created_at)->format('M d, Y') }}</td>
                                 <td class="d-flex gap-2">
-                                    <a href="#" class="btn btn-outline-primary btn-sm" role="button">Detail</a>
-                                    <button type="button" class="btn btn-outline-danger btn-sm">Ban</button>
+                                    <a href="{{ route('view_profile') }}?user_id={{ $user->id }}" class="btn btn-outline-primary btn-sm" role="button">Detail</a>
+                                    <form action="{{ route('admin.users.ban', $user->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Ban this user?');">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Ban</button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
