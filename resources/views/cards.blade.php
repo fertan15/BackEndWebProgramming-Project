@@ -84,10 +84,20 @@
                                     </p>
                                 @endif
 
-                                <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex justify-content-between align-items-center gap-1">
                                     <a href="{{ route('card.detail', $card->id) }}" class="btn btn-primary btn-sm">
                                         View Details
                                     </a>
+                                    
+                                    @if(Auth::check() && Auth::user()->is_admin)
+                                        <form action="{{ route('admin.cards.delete', $card->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this card?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete Card">
+                                                <i class="lni lni-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                     
                                     <form action="{{ route('wishlist.toggle', $card->id) }}" method="POST" class="wishlist-toggle-form">
                                         @csrf

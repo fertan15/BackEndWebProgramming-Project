@@ -218,4 +218,27 @@ class AdminController extends Controller
             ->route('admin.cards.create')
             ->with('success', 'Card created successfully.');
     }
+
+    public function deleteCard($id)
+    {
+        $card = Cards::findOrFail($id);
+        $setId = $card->card_set_id;
+
+        // Delete the card image file if it exists
+        if ($card->image_url) {
+            $imagePath = public_path($card->image_url);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
+        // Delete the card
+        $card->delete();
+
+        // Update card set count
+        $actualCount = Cards::where('card_set_id', $setId)->count();
+        CardSets::where('id', $setId)->update(['total_cards' => $actualCount]);
+
+        return redirect()->back()->with('success', 'Card deleted successfully.');
+    }
 }

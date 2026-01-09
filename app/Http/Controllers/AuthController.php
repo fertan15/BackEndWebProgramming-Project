@@ -346,13 +346,19 @@ class AuthController extends Controller
             return redirect('/login')->with('error', 'Please log in first.');
         }
 
-        // Set up session for step 3
+        // Set up session data
         $request->session()->put('register.user_id', $user->id);
         $request->session()->put('register.phone', $user->phone_number);
         $request->session()->put('register.email', $user->email);
         $request->session()->put('register.name', $user->name);
-        $request->session()->put('register.otp_verified', true);
 
+        // If account_status is 'verify', redirect to step 2 (OTP verification)
+        if ($user->account_status === 'verify') {
+            return redirect()->route('register.step2')->with('info', 'Please verify your email with OTP first.');
+        }
+
+        // If account_status is 'active' or OTP has been done, go to step 3
+        $request->session()->put('register.otp_verified', true);
         return redirect()->route('register.step3')->with('info', 'Please complete your identity verification.');
     }
 }
