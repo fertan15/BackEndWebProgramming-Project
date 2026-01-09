@@ -4,9 +4,23 @@
 
 @section('content')
 
+    <div id="url-message-container"></div>
+
     @if(session('error'))
         <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p class="text-sm text-red-700">{{ session('error') }}</p>
+        </div>
+    @endif
+
+    @if(session('warning'))
+        <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-sm text-yellow-700">{{ session('warning') }}</p>
+        </div>
+    @endif
+
+    @if(session('info'))
+        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-700">{{ session('info') }}</p>
         </div>
     @endif
 
@@ -42,4 +56,20 @@
             </p>
         </form>
     </div>
+
+    <script>
+        // Check for message in URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message) {
+            const container = document.getElementById('url-message-container');
+            container.innerHTML = `
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm text-red-700">${message}</p>
+                </div>
+            `;
+            // Clean URL without reloading
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
 @endsection

@@ -408,6 +408,12 @@
 
                         const data = await response.json();
 
+                        // Handle redirect to login
+                        if (response.status === 401 && data.redirect) {
+                            window.location.href = data.redirect + '?message=' + encodeURIComponent(data.message);
+                            return;
+                        }
+
                         if (!response.ok) {
                             throw new Error(data.message || 'Unable to update wishlist');
                         }
@@ -536,6 +542,21 @@
                     const data = await response.json();
                     console.log('Response data:', data);
 
+                    // Handle redirect to login
+                    if (response.status === 401 && data.redirect) {
+                        window.location.href = data.redirect + '?message=' + encodeURIComponent(data.message);
+                        return;
+                    }
+
+                    // Handle verification required (403)
+                    if (response.status === 403) {
+                        buyModal.hide();
+                        showMessage('warning', data.message || 'Verification required');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                        return;
+                    }
+
                     // Check if response is successful
                     if (response.ok) {
                         // Show success message before reload
@@ -544,7 +565,7 @@
                             window.location.href = '{{ url('/cards/' . $card->id) }}';
                         }, 1500);
                     } else {
-                        throw new Error(data.error || 'Purchase failed');
+                        throw new Error(data.error || data.message || 'Purchase failed');
                     }
                 } catch (error) {
                     console.error('Error:', error);

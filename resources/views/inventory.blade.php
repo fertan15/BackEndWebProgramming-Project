@@ -43,6 +43,13 @@
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <!-- Tabs for Tradeable and Locked Cards -->
             <ul class="nav nav-tabs mb-4" id="inventoryTabs" role="tablist">
                 <li class="nav-item" role="presentation">

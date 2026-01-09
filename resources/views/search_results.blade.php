@@ -111,16 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Error');
-
-                const inWishlist = data.in_wishlist === true;
-                button.dataset.inWishlist = inWishlist ? '1' : '0';
-                button.innerHTML = `<span class="wishlist-icon">${inWishlist ? iconFill : iconOutline}</span>`;
-                button.title = inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist';
-                
-                button.classList.toggle('btn-outline-danger', !inWishlist);
-                button.classList.toggle('btn-danger', inWishlist);
-
+            
+            // Handle redirect to login
+            if (response.status === 401 && data.redirect) {
+                window.location.href = data.redirect + '?message=' + encodeURIComponent(data.message);
+                return;
+            }
+            
                 showMessage('success', data.message);
             } catch (error) {
                 button.innerHTML = previousContent;

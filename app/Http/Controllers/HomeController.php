@@ -306,6 +306,19 @@ class HomeController extends Controller
         }
 
         $userId = auth()->id();
+        // Block creating listings for users who are not identity verified
+        $user = \App\Models\Users::find($userId);
+        if ($user && $user->identity_status !== 'verified') {
+            $message = 'Identity verification is required to sell cards.';
+            if ($user->identity_status === 'unverified') {
+                $message = 'Please verify your identity before you can sell cards.';
+            } elseif ($user->identity_status === 'pending') {
+                $message = 'Your identity verification is pending approval. You can sell cards once verified.';
+            } elseif ($user->identity_status === 'rejected') {
+                $message = 'Your identity verification was rejected. Please resubmit your documents.';
+            }
+            return redirect()->back()->with('warning', $message);
+        }
         
         // Verify the collection belongs to the user
         $collection = \App\Models\UserCollections::where('id', $collectionId)

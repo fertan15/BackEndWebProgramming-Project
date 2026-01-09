@@ -166,9 +166,28 @@ class CardController extends Controller
     }
 
     public function savelisting(Request $request) {
+        // Enforce identity verification for sellers
+        $userId = $request->session()->get('user_id');
+        if (!$userId) {
+            return redirect('/login')->with('error', 'Please login to create listings.');
+        }
+
+        $user = \App\Models\Users::find($userId);
+        if ($user && $user->identity_status !== 'verified') {
+            $message = 'Identity verification is required to sell cards.';
+            if ($user->identity_status === 'unverified') {
+                $message = 'Please verify your identity before you can sell cards.';
+            } elseif ($user->identity_status === 'pending') {
+                $message = 'Your identity verification is pending approval. You can sell cards once verified.';
+            } elseif ($user->identity_status === 'rejected') {
+                $message = 'Your identity verification was rejected. Please resubmit your documents.';
+            }
+            return redirect()->back()->with('warning', $message);
+        }
+
         Listings::create([
             'card_id' => $request->cardid,
-            'seller_id' => $request->sellerid,
+            'seller_id' => $userId,
             'price' => $request->price,
             'condition_text' => $request->condition,
             'description' => '',

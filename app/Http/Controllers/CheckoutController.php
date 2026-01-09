@@ -20,12 +20,26 @@ class CheckoutController extends Controller
             return redirect('/login')->with('error', 'Please login first.');
         }
 
+        // Require identity verification to access checkout
+        $currentUser = Auth::user();
+        if ($currentUser && $currentUser->identity_status !== 'verified') {
+            $message = 'Identity verification is required to buy cards.';
+            if ($currentUser->identity_status === 'unverified') {
+                $message = 'Please verify your identity before you can buy cards.';
+            } elseif ($currentUser->identity_status === 'pending') {
+                $message = 'Your identity verification is pending approval. You can buy cards once verified.';
+            } elseif ($currentUser->identity_status === 'rejected') {
+                $message = 'Your identity verification was rejected. Please resubmit your documents.';
+            }
+            return redirect()->back()->with('warning', $message);
+        }
+
         $card = Cards::find($request->card_id);
         if (!$card) {
             return redirect('/home')->with('error', 'Card not found.');
         }
 
-        $user = Auth::user();
+        $user = $currentUser;
 
         return view('checkout', [
             'card' => $card,
@@ -41,6 +55,18 @@ class CheckoutController extends Controller
         }
 
         $user = Auth::user();
+        // Block purchase for users who are not identity verified
+        if ($user && $user->identity_status !== 'verified') {
+            $message = 'Identity verification is required to buy cards.';
+            if ($user->identity_status === 'unverified') {
+                $message = 'Please verify your identity before you can buy cards.';
+            } elseif ($user->identity_status === 'pending') {
+                $message = 'Your identity verification is pending approval. You can buy cards once verified.';
+            } elseif ($user->identity_status === 'rejected') {
+                $message = 'Your identity verification was rejected. Please resubmit your documents.';
+            }
+            return redirect()->back()->with('warning', $message);
+        }
         $card = Cards::find($request->card_id);
 
         if (!$card) {
@@ -85,6 +111,22 @@ class CheckoutController extends Controller
 
         $userId = Auth::id();
         $user = Auth::user();
+        
+        // Block purchase for users who are not identity verified
+        if ($user && $user->identity_status !== 'verified') {
+            $message = 'Identity verification is required to buy cards.';
+            if ($user->identity_status === 'unverified') {
+                $message = 'Please verify your identity before you can buy cards.';
+            } elseif ($user->identity_status === 'pending') {
+                $message = 'Your identity verification is pending approval. You can buy cards once verified.';
+            } elseif ($user->identity_status === 'rejected') {
+                $message = 'Your identity verification was rejected. Please resubmit your documents.';
+            }
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $message], 403);
+            }
+            return redirect()->back()->with('warning', $message);
+        }
         
         $listing = Listings::find($listingId);
         if (!$listing) {
@@ -250,5 +292,31 @@ class CheckoutController extends Controller
             ->get();
 
         return view('orders.index', compact('orders'));
+    }
+
+    /**
+     * Show invoice for an order item (buyer or seller can view)
+     */
+    public function invoice($orderItemId)
+    {
+        if (!Auth::check()) {
+            return redirect('/login')->with('error', 'Please login to view invoices.');
+        }
+
+        $orderItem = OrderItems::with(['listing.card', 'listing.seller', 'buyer'])
+            ->findOrFail($orderItemId);
+
+        $currentUserId = Auth::id();
+        // Only buyer or seller can view
+        if ($orderItem->buyer_id !== $currentUserId && $orderItem->listing->seller_id !== $currentUserId) {
+            abort(403, 'Unauthorized to view this invoice.');
+        }
+
+        $total = $orderItem->price_at_purchase * $orderItem->quantity;
+
+        return view('orders.invoice', [
+            'order' => $orderItem,
+            'total' => $total,
+        ]);
     }
 }

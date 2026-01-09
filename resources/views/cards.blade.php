@@ -207,6 +207,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
+                
+                // Handle redirect to login
+                if (response.status === 401 && data.redirect) {
+                    window.location.href = data.redirect + '?message=' + encodeURIComponent(data.message);
+                    return;
+                }
+                
                 if (!response.ok) throw new Error(data.message || 'Error');
 
                 const inWishlist = data.in_wishlist === true;

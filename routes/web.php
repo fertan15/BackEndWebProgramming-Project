@@ -87,15 +87,15 @@ Route::get('/cards', [CardController::class, 'showAllCards'])->name('cards');
 
 // nampilin individu
 Route::get('/cards/{cardId}', [CardController::class, 'showCardDetail'])->name('card.detail');
-Route::post('/savelistings', [CardController::class, 'savelisting'])->name('savelistings');
+Route::post('/savelistings', [CardController::class, 'savelisting'])->middleware('verified.transaction')->name('savelistings');
 
 Route::get('/viewprofile', [HomeController::class, 'viewprofile'])->name('view_profile');
 Route::post('/viewprofile', [HomeController::class, 'updateProfile'])->name('update_profile');
 // Route::get('/cards',  [HomeController::class, 'showCard'])->name('cards'); 
-Route::get('/wishlist', [HomeController::class, 'showWishlist'])->name('wishlist');
-Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist'])->name('wishlist.toggle');
+Route::get('/wishlist', [HomeController::class, 'showWishlist'])->middleware('verified')->name('wishlist');
+Route::post('/wishlist/toggle/{cardId}', [HomeController::class, 'toggleWishlist'])->middleware('verified')->name('wishlist.toggle');
 Route::get('/inventory', [HomeController::class, 'showInventory'])->name('inventory.index');
-Route::post('/inventory/add-listing/{collectionId}', [HomeController::class, 'addListing'])->name('inventory.addListing');
+Route::post('/inventory/add-listing/{collectionId}', [HomeController::class, 'addListing'])->middleware('verified.transaction')->name('inventory.addListing');
 Route::post('/inventory/lock/{collectionId}', [HomeController::class, 'lockCard'])->name('inventory.lock');
 Route::post('/inventory/unlock/{collectionId}', [HomeController::class, 'unlockCard'])->name('inventory.unlock');
 Route::get('/dashboard', function () {
@@ -121,6 +121,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
     // buat orders (history)
     Route::get('/orders', [CheckoutController::class, 'history'])->name('orders');
+    Route::get('/orders/{orderItem}/invoice', [CheckoutController::class, 'invoice'])->name('orders.invoice');
     // Transaction history (buying and selling)
     Route::get('/history', [HomeController::class, 'showHistory'])->name('history');
 });
@@ -135,9 +136,9 @@ Route::get('/search', [DashboardController::class, 'search'])->name('search.resu
 
 
 //route checkout
-Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->name('checkout.show');
-Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->name('purchase.process');
-Route::post('/buy-listing/{listingId}', [CheckoutController::class, 'buyListing'])->name('buy.listing');
+Route::get('/checkout', [CheckoutController::class, 'showCheckout'])->middleware('verified.transaction')->name('checkout.show');
+Route::post('/purchase/process', [CheckoutController::class, 'processPurchase'])->middleware('verified.transaction')->name('purchase.process');
+Route::post('/buy-listing/{listingId}', [CheckoutController::class, 'buyListing'])->middleware('verified.transaction')->name('buy.listing');
 Route::post('/cancel-listing/{listingId}', [CardController::class, 'cancelListing'])->name('cancel.listing');
 
 // Settings route

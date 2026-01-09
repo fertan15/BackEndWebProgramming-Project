@@ -47,6 +47,7 @@
                                             <th>Quantity</th>
                                             <th>Total</th>
                                             <th>Date</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -70,6 +71,9 @@
                                                     <strong>${{ number_format($purchase->price_at_purchase * $purchase->quantity, 2) }}</strong>
                                                 </td>
                                                 <td>{{ is_string($purchase->purchased_at) ? \Carbon\Carbon::parse($purchase->purchased_at)->format('M d, Y H:i') : $purchase->purchased_at->format('M d, Y H:i') }}</td>
+                                                <td>
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('orders.invoice', $purchase->id) }}">Invoice</a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -97,6 +101,7 @@
                                             <th>Total Revenue</th>
                                             <th>Date Sold</th>
                                             <th>Status</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -122,6 +127,9 @@
                                                 <td>{{ is_string($sale->purchased_at) ? \Carbon\Carbon::parse($sale->purchased_at)->format('M d, Y H:i') : $sale->purchased_at->format('M d, Y H:i') }}</td>
                                                 <td>
                                                     <span class="badge bg-success">Completed</span>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('orders.invoice', $sale->id) }}">Invoice</a>
                                                 </td>
                                             </tr>
                                         @endforeach
