@@ -43,6 +43,15 @@ class AdminController extends Controller
         ]);
     }
 
+    public function userDetail($id)
+    {
+        $user = Users::findOrFail($id);
+
+        return view('admin.user_detail', [
+            'user' => $user,
+        ]);
+    }
+
     public function createCardSetForm()
     {
         return view('admin.card_sets_create');

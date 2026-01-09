@@ -234,7 +234,14 @@ class AuthController extends Controller
     public function showRegisterStep3()
     {
         // Check if OTP was verified
-        if (!session('register.otp_verified')) {
+        if(Auth::check()) {
+            if(Auth::user()->account_status === 'active' && Auth::user()->identity_status !== 'verified' ) {
+                return view('auth.register_step3');
+            }else{
+                return redirect('/home');
+            }
+        }
+        else if (!session('register.otp_verified')) {
             return redirect()->route('register.step2')->with('error', 'Please verify OTP first.');
         }
         
