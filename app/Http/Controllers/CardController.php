@@ -7,6 +7,7 @@ use App\Models\CardSets;
 use App\Models\Listings;
 use App\Models\Wishlists;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CardController extends Controller
 {
@@ -121,8 +122,8 @@ class CardController extends Controller
                     ->orderBy('purchased_at', 'desc')
                     ->get();
         
-        // Get price history data (placeholder for now)
-        $priceHistory = $this->generateMockPriceHistory($card->estimated_market_price);
+        // Get REAL price history data from actual transactions
+        $priceHistory = $this->getRealPriceHistory($cardId, $card->estimated_market_price);
         
         // Get related cards from the same set
         $relatedCards = Cards::where('card_set_id', $card->card_set_id)
@@ -141,27 +142,67 @@ class CardController extends Controller
     }
 
     /**
-     * Generate mock price history data for the chart
-     * TODO: Replace with real transaction data later
+     * Get real price history from actual transactions
      */
-    private function generateMockPriceHistory($basePrice)
+    private function getRealPriceHistory($cardId, $basePrice)
     {
+        // Get transactions for this card over the last 30 days
+        $transactions = \App\Models\OrderItems::whereHas('listing', function($q) use ($cardId) {
+                            $q->where('card_id', $cardId);
+                        })
+                        ->where('purchased_at', '>=', now()->subDays(30))
+                        ->select(
+                            DB::raw('DATE(purchased_at) as date'),
+                            DB::raw('AVG(price_at_purchase) as avg_price')
+                        )
+                        ->groupBy('date')
+                        ->orderBy('date', 'asc')
+                        ->get();
+
         $dates = [];
         $prices = [];
         
-        // mockupnya buat sekitar 30 hari
-        for ($i = 29; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $dates[] = $date->format('M d');
+        // If we have transaction data, use it
+        if ($transactions->isNotEmpty()) {
+            // Create a map of dates with actual data
+            $transactionMap = [];
+            foreach ($transactions as $transaction) {
+                $transactionMap[$transaction->date] = (float) $transaction->avg_price;
+            }
             
-            // randomizer 15% up or down
-            $variation = (rand(-15, 15) / 100);
-            $prices[] = round($basePrice * (1 + $variation), 2);
+            // Fill in all 30 days
+            for ($i = 29; $i >= 0; $i--) {
+                $date = now()->subDays($i);
+                $dateKey = $date->format('Y-m-d');
+                $dates[] = $date->format('M d');
+                
+                // If we have a transaction for this date, use it
+                if (isset($transactionMap[$dateKey])) {
+                    $prices[] = round($transactionMap[$dateKey], 2);
+                } else {
+                    // Use the last known price or estimated market price
+                    if (!empty($prices)) {
+                        // Carry forward the last price
+                        $prices[] = $prices[count($prices) - 1];
+                    } else {
+                        // Use estimated market price if no prior data
+                        $prices[] = round($basePrice, 2);
+                    }
+                }
+            }
+        } else {
+            // No transaction data available - show estimated market price as flat line
+            for ($i = 29; $i >= 0; $i--) {
+                $date = now()->subDays($i);
+                $dates[] = $date->format('M d');
+                $prices[] = round($basePrice, 2);
+            }
         }
         
         return [
             'dates' => $dates,
-            'prices' => $prices
+            'prices' => $prices,
+            'hasRealData' => $transactions->isNotEmpty()
         ];
     }
 
