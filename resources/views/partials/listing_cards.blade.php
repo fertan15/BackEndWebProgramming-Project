@@ -1,39 +1,44 @@
 @forelse ($listings as $listing)
-    <div class="pokemon-card-wrapper group h-full mx-auto w-full" style="max-width: 320px;">
-        <a href="{{ route('card.detail', $listing->card->id) }}" class="text-decoration-none">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-2 h-full">
+    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <div class="pokemon-card-wrapper group h-100">
+            <a href="{{ route('card.detail', $listing->card->id) }}" class="text-decoration-none">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 transition-all duration-300 hover:shadow-lg h-100" style="transform: translateY(0); transition: all 0.3s ease;">
                 
-                <div class="relative aspect-[2.5/3.5] rounded-lg overflow-hidden mb-4 bg-gray-50 shadow-inner">
+                <div class="relative rounded-lg overflow-hidden mb-3 bg-gray-50 shadow-inner" style="aspect-ratio: 2.5/3.5;">
                     <img 
                         src="{{ asset($listing->card->image_url) }}" 
                         alt="{{ $listing->card->name }}"
-                        class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                        class="w-100 h-100 object-contain p-2 transition-transform duration-500"
                         loading="lazy"
+                        style="object-fit: contain;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'"
                     >
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none holo-sheen"></div>
+                    <div class="position-absolute top-0 start-0 end-0 bottom-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none holo-sheen"></div>
                 </div>
 
-                <div class="space-y-1">
-                    <h3 class="font-bold text-gray-900 text-base truncate mb-0">
+                <div class="d-flex flex-column gap-1">
+                    <h3 class="fw-bold text-dark text-truncate mb-0" style="font-size: 0.95rem;">
                         {{ $listing->card->name }}
                     </h3>
-                    <p class="text-xs text-gray-400 mb-3">
-                        Listed by <span class="text-indigo-600 fw-medium">{{ $listing->seller->name }}</span>
+                    <p class="text-muted mb-2" style="font-size: 0.75rem;">
+                        Listed by <span class="text-primary fw-medium">{{ $listing->seller->name }}</span>
                     </p>
                     
-                    <div class="pt-3 border-t border-gray-100 d-flex justify-content-between align-items-center">
-                        <span class="text-xs text-gray-500 uppercase font-semibold">Price</span>
-                        <span class="text-lg font-black text-indigo-600">
+                    <div class="pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                        <span class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Price</span>
+                        <span class="fw-bold text-primary" style="font-size: 1.1rem;">
                             ${{ number_format($listing->price, 2) }}
                         </span>
                     </div>
                 </div>
             </div>
-        </a>
+            </a>
+        </div>
     </div>
 @empty
-    <div class="col-span-full py-20 text-center">
-        <p class="text-gray-400 font-medium">No active listings found.</p>
+    <div class="col-12 py-5 text-center">
+        <p class="text-muted fw-medium">No active listings found.</p>
     </div>
 @endforelse
 

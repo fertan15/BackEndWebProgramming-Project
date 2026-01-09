@@ -59,7 +59,7 @@
                     </div>
 
                     {{-- ini ajaxnya yang ngerefresh tiap 30 detik --}}
-                    <div id="latest-listings-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full justify-center justify-items-center">
+                    <div id="latest-listings-container" class="row g-4">
                         @include('partials.listing_cards', ['listings' => $latestListings])
                     </div>
                 </div>
