@@ -142,6 +142,7 @@ Route::get('/settings', [HomeController::class, 'showSettings'])->name('settings
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::put('/users/{id}/ban', [AdminController::class, 'banUser'])->name('users.ban');
     Route::get('/requests', [AdminController::class, 'requests'])->name('requests');
     Route::post('/requests/{id}/approve', [AdminController::class, 'approveRequest'])->name('requests.approve');
     Route::post('/requests/{id}/reject', [AdminController::class, 'rejectRequest'])->name('requests.reject');

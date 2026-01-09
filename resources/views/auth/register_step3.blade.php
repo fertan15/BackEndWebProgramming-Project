@@ -115,13 +115,10 @@
             </button>
         </div>
         
-        <button type="button" 
-                class="w-full mt-4 text-center py-3 px-4 text-sm text-indigo-600 font-semibold hover:text-indigo-700 transition duration-150">
-            Skip for now
-        <button type="button" 
-                class="w-full mt-4 text-center py-3 px-4 text-sm text-indigo-600 font-semibold hover:text-indigo-700 transition duration-150">
+        <a href="{{ route('home') }}" 
+           class="w-full mt-4 text-center py-3 px-4 text-sm text-indigo-600 font-semibold hover:text-indigo-700 transition duration-150 d-block">
             Skip for now (verify later)
-        </button>
+        </a>
     </form>
 
     <script>

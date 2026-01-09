@@ -55,6 +55,11 @@ class AuthController extends Controller
             return back()->with('error', 'Invalid email or password.');
         }
 
+        // Check if account is banned
+        if ($user->account_status === 'banned') {
+            return back()->with('error', 'Your account has been banned. Please contact support for assistance.');
+        }
+
         // Check if account is active
         if ($user->account_status !== 'active') {
             return back()->with('error', 'Your account is not active. Please complete registration.');

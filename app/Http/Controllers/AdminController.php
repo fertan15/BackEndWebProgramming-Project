@@ -131,13 +131,36 @@ class AdminController extends Controller
             }
         }
 
-        // Update user status and clear identity information
+        // Update user status and clear all identity information
         $user->identity_status = 'rejected';
         $user->account_status = $user->account_status ?: 'verify';
         $user->identity_image_url = null; // Clear the image path from database
+        $user->identity_number = null; // Allow user to resubmit with same or different ID
+        $user->identity_type = null; // Reset identity type
         $user->save();
 
         return redirect()->route('admin.requests')->with('success', 'User verification rejected.');
+    }
+
+    public function banUser($id)
+    {
+        $user = Users::findOrFail($id);
+
+        if ($user->account_status === 'banned') {
+            // Unban the user
+            $user->account_status = 'active';
+            $user->banned_at = null;
+            $message = 'User has been unbanned successfully.';
+        } else {
+            // Ban the user
+            $user->account_status = 'banned';
+            $user->banned_at = now();
+            $message = 'User has been banned successfully.';
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users')->with('success', $message);
     }
 
     public function storeCard(Request $request)
