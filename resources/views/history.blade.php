@@ -54,11 +54,24 @@
                                         @foreach($buyingHistory as $purchase)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('card.detail', $purchase->listing->card->id) }}" class="text-decoration-none">
-                                                        <strong>{{ $purchase->listing->card->name }}</strong>
-                                                    </a>
-                                                    <br>
-                                                    <small class="text-muted">{{ $purchase->listing->condition_text }}</small>
+                                                    <div class="d-flex align-items-center">
+                                                        {{-- Image Handling --}}
+                                                        <div style="width: 50px; height: 70px; overflow: hidden; border-radius: 4px; margin-right: 15px; background: #f0f0f0;">
+                                                            @if($purchase->listing && $purchase->listing->card)
+                                                                <img src="{{ asset($purchase->listing->card->image_url) }}" 
+                                                                     alt="{{ $purchase->listing->card->name }}" 
+                                                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                                            @else
+                                                                <div class="d-flex align-items-center justify-content-center h-100 text-muted">?</div>
+                                                            @endif
+                                                        </div>
+                                                        <div>
+                                                            <a href="{{ route('card.detail', $purchase->listing->card->id) }}" class="text-decoration-none">
+                                                                <h6 class="mb-0 fw-bold">{{ $purchase->listing->card->name }}</h6>
+                                                            </a>
+                                                            <small class="text-muted">{{ $purchase->listing->condition_text }}</small>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <span class="badge bg-info">{{ $purchase->listing->seller->name }}</span>
@@ -108,11 +121,24 @@
                                         @foreach($sellingHistory as $sale)
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('card.detail', $sale->listing->card->id) }}" class="text-decoration-none">
-                                                        <strong>{{ $sale->listing->card->name }}</strong>
-                                                    </a>
-                                                    <br>
-                                                    <small class="text-muted">{{ $sale->listing->condition_text }}</small>
+                                                    <div class="d-flex align-items-center">
+                                                        {{-- Image Handling --}}
+                                                        <div style="width: 50px; height: 70px; overflow: hidden; border-radius: 4px; margin-right: 15px; background: #f0f0f0;">
+                                                            @if($sale->listing && $sale->listing->card)
+                                                                <img src="{{ asset($sale->listing->card->image_url) }}" 
+                                                                     alt="{{ $sale->listing->card->name }}" 
+                                                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                                            @else
+                                                                <div class="d-flex align-items-center justify-content-center h-100 text-muted">?</div>
+                                                            @endif
+                                                        </div>
+                                                        <div>
+                                                            <a href="{{ route('card.detail', $sale->listing->card->id) }}" class="text-decoration-none">
+                                                                <h6 class="mb-0 fw-bold">{{ $sale->listing->card->name }}</h6>
+                                                            </a>
+                                                            <small class="text-muted">{{ $sale->listing->condition_text }}</small>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <span class="badge bg-success">{{ $sale->buyer->name }}</span>

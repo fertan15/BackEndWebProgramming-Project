@@ -156,6 +156,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/requests/{id}/reject', [AdminController::class, 'rejectRequest'])->name('requests.reject');
     Route::get('/card-sets/create', [AdminController::class, 'createCardSetForm'])->name('card_sets.create');
     Route::post('/card-sets', [AdminController::class, 'storeCardSet'])->name('card_sets.store');
+    Route::delete('/card-sets/{id}', [AdminController::class, 'deleteCardSet'])->name('card_sets.delete');
     Route::get('/cards/create', [AdminController::class, 'createCardForm'])->name('cards.create');
     Route::post('/cards', [AdminController::class, 'storeCard'])->name('cards.store');
     Route::delete('/cards/{id}', [AdminController::class, 'deleteCard'])->name('cards.delete');

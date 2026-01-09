@@ -2,6 +2,27 @@
 
 @section('main_contents')
 <div class="container py-5">
+    @if(session('warning'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+            <strong>⚠️ Warning:</strong> {{ session('warning') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+            <strong>❌ Error:</strong> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+            <strong>✅ Success:</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row justify-content-center">
         <div class="col-lg-11">
             <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">

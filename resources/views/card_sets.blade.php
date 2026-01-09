@@ -3,6 +3,27 @@
 @section('main_contents')
     <section class="section">
         <div class="container-fluid">
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>⚠️ Warning:</strong> {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>❌ Error:</strong> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>✅ Success:</strong> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="title-wrapper pt-30">
                 <div class="row align-items-center">
                     <div class="col-md-6">
@@ -43,9 +64,20 @@
                                 @if($set->description)
                                     <p class="card-text small mb-3">{{ Str::limit($set->description, 100) }}</p>
                                 @endif
-                                <a href="{{ route('set.cards', $set->id) }}" class="btn btn-primary mt-auto">
-                                    View Cards
-                                </a>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <a href="{{ route('set.cards', $set->id) }}" class="btn btn-primary flex-grow-1">
+                                        View Cards
+                                    </a>
+                                    @if(Auth::check() && Auth::user()->is_admin)
+                                        <form action="{{ route('admin.card_sets.delete', $set->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this card set?@if($set->cards_count > 0)\n\n⚠️ This set has {{ $set->cards_count }} card(s) that will also be deleted.@endif');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger" title="Delete Set">
+                                                <i class="lni lni-trash-can"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
