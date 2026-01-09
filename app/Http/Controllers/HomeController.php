@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Listings;
 use App\Models\Wishlists;
 use App\Models\User;
+use App\Models\OrderItems;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -291,5 +292,37 @@ class HomeController extends Controller
         $collection->update(['is_for_trade' => true]);
 
         return redirect()->route('inventory.index')->with('success', 'Card unlocked successfully!');
+    }
+
+    /**
+     * Display transaction history (buying and selling)
+     */
+    public function showHistory(Request $request)
+    {
+        if (!auth()->check()) {
+            return redirect('/login')->with('error', 'Please login to view history.');
+        }
+
+        $userId = auth()->id();
+
+        // Get buying history (purchases made by user)
+        $buyingHistory = OrderItems::where('buyer_id', $userId)
+                                    ->with(['listing' => function($q) {
+                                        $q->with(['card', 'seller']);
+                                    }])
+                                    ->orderBy('purchased_at', 'desc')
+                                    ->get();
+
+        // Get selling history (sales made by user)
+        $sellingHistory = OrderItems::whereHas('listing', function($q) use ($userId) {
+                                        $q->where('seller_id', $userId);
+                                    })
+                                    ->with(['listing' => function($q) {
+                                        $q->with(['card', 'seller']);
+                                    }, 'buyer'])
+                                    ->orderBy('purchased_at', 'desc')
+                                    ->get();
+
+        return view('history', compact('buyingHistory', 'sellingHistory'));
     }
 }

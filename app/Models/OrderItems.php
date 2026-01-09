@@ -23,6 +23,7 @@ class OrderItems extends Model
     protected $casts = [
         'quantity' => 'integer',
         'price_at_purchase' => 'decimal:2',
+        'purchased_at' => 'datetime',
     ];
 
     public function listing()

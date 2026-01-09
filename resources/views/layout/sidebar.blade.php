@@ -159,6 +159,18 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="{{ route('history') }}">
+                <span class="icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM10 4C13.3137 4 16 6.68629 16 10C16 13.3137 13.3137 16 10 16C6.68629 16 4 13.3137 4 10C4 6.68629 6.68629 4 10 4Z" />
+                        <path d="M10.5 6C10.2239 6 10 6.22386 10 6.5V10C10 10.2761 10.2239 10.5 10.5 10.5H13.5C13.7761 10.5 14 10.2761 14 10C14 9.72386 13.7761 9.5 13.5 9.5H11V6.5C11 6.22386 10.7761 6 10.5 6Z" />
+                    </svg>
+                </span>
+                <span class="text">History</span>
+                </a>
+            </li>
+
             @endauth
             
             <span class="divider">

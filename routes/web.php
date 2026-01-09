@@ -118,6 +118,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unreadCount');
     // buat orders (history)
     Route::get('/orders', [CheckoutController::class, 'history'])->name('orders');
+    // Transaction history (buying and selling)
+    Route::get('/history', [HomeController::class, 'showHistory'])->name('history');
 });
 
 //route top up
