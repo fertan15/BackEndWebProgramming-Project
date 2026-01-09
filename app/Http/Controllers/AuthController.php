@@ -234,14 +234,7 @@ class AuthController extends Controller
     public function showRegisterStep3()
     {
         // Check if OTP was verified
-        if(Auth::check()) {
-            if(Auth::user()->account_status === 'active' && Auth::user()->identity_status !== 'verified' ) {
-                return view('auth.register_step3');
-            }else{
-                return redirect('/home');
-            }
-        }
-        else if (!session('register.otp_verified')) {
+        if (!session('register.otp_verified')) {
             return redirect()->route('register.step2')->with('error', 'Please verify OTP first.');
         }
         
@@ -340,5 +333,26 @@ class AuthController extends Controller
         $request->session()->forget(['register.email', 'register.phone', 'register.user_id', 'register.otp_verified']);
 
         return redirect('/home')->with('success', 'Registration complete! Your identity verification is pending approval.');
+    }
+
+    /**
+     * Redirect user to step 3 for identity verification from profile
+     */
+    public function redirectToVerification(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect('/login')->with('error', 'Please log in first.');
+        }
+
+        // Set up session for step 3
+        $request->session()->put('register.user_id', $user->id);
+        $request->session()->put('register.phone', $user->phone_number);
+        $request->session()->put('register.email', $user->email);
+        $request->session()->put('register.name', $user->name);
+        $request->session()->put('register.otp_verified', true);
+
+        return redirect()->route('register.step3')->with('info', 'Please complete your identity verification.');
     }
 }

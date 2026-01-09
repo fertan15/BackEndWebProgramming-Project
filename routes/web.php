@@ -51,6 +51,9 @@ Route::post('/register/step3', [AuthController::class, 'storeRegisterStep2'])->n
 // Step 3: Identification/Document Upload Form (GET /register/step3 to show the form)
 Route::get('/register/step3', [AuthController::class, 'showRegisterStep3'])->name('register.step3');
 
+// Redirect to verification from profile
+Route::get('/verify-identity', [AuthController::class, 'redirectToVerification'])->name('verify.identity');
+
 // Step 3 Submission: POST to /register/complete (Final Submission to complete registration)
 Route::post('/register/complete', [AuthController::class, 'completeRegistration'])->name('register.complete');
 
