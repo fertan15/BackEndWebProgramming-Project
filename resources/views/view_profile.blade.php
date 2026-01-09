@@ -135,7 +135,7 @@
                         @if($user && $user->identity_status !== 'verified')
                             <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
                                 <span>Your identity is not verified yet.</span>
-                                <a class="main-btn primary-btn btn-sm" href="{{ url('/register/step3') }}">Verify Now</a>
+                                <a class="main-btn primary-btn btn-sm" href="{{ route('verify.identity') }}">Verify Now</a>
                             </div>
                         @endif
 
