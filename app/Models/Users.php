@@ -35,6 +35,7 @@ class Users extends Model implements Authenticatable
         'identity_type',
         'identity_number',
         'identity_image_url',
+        'identity_card_url',
         'identity_status',
         'otp_code',
         'otp_expires_at',

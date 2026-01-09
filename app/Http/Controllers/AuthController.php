@@ -317,7 +317,7 @@ class AuthController extends Controller
         Users::where('id', $userId)->update([
             'identity_type' => $identityType,
             'identity_number' => $identityNumber,
-            'identity_image_url' => $imagePath,
+            'identity_card_url' => $imagePath,
             'identity_status' => 'pending', // Change from unverified to pending
             'account_status' => 'active' // Mark account as active (identity verification pending)
         ]);

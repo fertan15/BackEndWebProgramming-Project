@@ -1,5 +1,5 @@
 /*
-SQLyog Community v13.3.0 (64 bit)
+SQLyog Community v13.3.1 (64 bit)
 MySQL - 10.4.32-MariaDB : Database - pocketraderdb
 *********************************************************************
 */
@@ -365,6 +365,7 @@ CREATE TABLE `users` (
   `identity_type` enum('KTP','SIM','Passport') DEFAULT NULL,
   `identity_number` varchar(50) DEFAULT NULL,
   `identity_image_url` varchar(255) DEFAULT NULL,
+  `identity_card_url` varchar(255) DEFAULT NULL,
   `identity_status` enum('unverified','pending','verified','rejected') DEFAULT 'unverified',
   `otp_code` varchar(10) DEFAULT NULL,
   `otp_expires_at` timestamp NULL DEFAULT NULL,
@@ -382,12 +383,12 @@ CREATE TABLE `users` (
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`name`,`username`,`password_hash`,`email`,`phone_number`,`balance`,`identity_type`,`identity_number`,`identity_image_url`,`identity_status`,`otp_code`,`otp_expires_at`,`account_status`,`ban_reason`,`banned_at`,`is_admin`,`last_online`,`created_at`) values 
-(1,'Benny Example','benny','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','benny@example.com',NULL,9895.98,NULL,NULL,NULL,'verified',NULL,NULL,'active',NULL,NULL,1,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
-(2,'Alice Seller','alice','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','alice@example.com',NULL,50.00,NULL,NULL,NULL,'verified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
-(3,'Bob Seller','bob','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','bob@example.com',NULL,13.97,NULL,NULL,NULL,'rejected',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
-(4,'Carla Buyer','carla','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','carla@example.com',NULL,200.00,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
-(5,'Derek Buyer','derek','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','derek@example.com',NULL,150.00,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34');
+insert  into `users`(`id`,`name`,`username`,`password_hash`,`email`,`phone_number`,`balance`,`identity_type`,`identity_number`,`identity_image_url`,`identity_card_url`,`identity_status`,`otp_code`,`otp_expires_at`,`account_status`,`ban_reason`,`banned_at`,`is_admin`,`last_online`,`created_at`) values 
+(1,'Benny Example','benny','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','benny@example.com',NULL,9895.98,NULL,NULL,NULL,NULL,'verified',NULL,NULL,'active',NULL,NULL,1,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
+(2,'Alice Seller','alice','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','alice@example.com',NULL,50.00,NULL,NULL,NULL,NULL,'verified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
+(3,'Bob Seller','bob','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','bob@example.com',NULL,13.97,NULL,NULL,NULL,NULL,'rejected',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
+(4,'Carla Buyer','carla','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','carla@example.com',NULL,200.00,NULL,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
+(5,'Derek Buyer','derek','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','derek@example.com',NULL,150.00,NULL,NULL,NULL,NULL,'unverified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34');
 
 /*Table structure for table `wallet_transactions` */
 

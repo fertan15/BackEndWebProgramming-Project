@@ -124,8 +124,8 @@ class AdminController extends Controller
         $user = Users::findOrFail($id);
 
         // Delete the identity image file if it exists
-        if ($user->identity_image_url) {
-            $imagePath = public_path($user->identity_image_url);
+        if ($user->identity_card_url) {
+            $imagePath = public_path($user->identity_card_url);
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }
@@ -134,7 +134,7 @@ class AdminController extends Controller
         // Update user status and clear all identity information
         $user->identity_status = 'rejected';
         $user->account_status = $user->account_status ?: 'verify';
-        $user->identity_image_url = null; // Clear the image path from database
+        $user->identity_card_url = null; // Clear the image path from database
         $user->identity_number = null; // Allow user to resubmit with same or different ID
         $user->identity_type = null; // Reset identity type
         $user->save();

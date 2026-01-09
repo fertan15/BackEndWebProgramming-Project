@@ -90,6 +90,35 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Identity Document (read-only) -->
+                    <div class="card-style mt-30">
+                        <div class="title mb-20 d-flex justify-content-between align-items-center">
+                            <h6>Identity Verification</h6>
+                            <span class="badge" style="background-color: 
+                                @if($user && $user->identity_status === 'verified') #4CAF50 @elseif($user && $user->identity_status === 'rejected') #f44336 @else #2196F3 @endif">
+                                {{ $user ? ucfirst($user->identity_status) : 'Unverified' }}
+                            </span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted text-sm d-block">ID Type</label>
+                            <strong>{{ $user->identity_type ?? '—' }}</strong>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted text-sm d-block">ID Number</label>
+                            <strong>{{ $user->identity_number ?? '—' }}</strong>
+                        </div>
+                        <div class="text-center">
+                            @if(!empty($user->identity_card_url))
+                                <img src="{{ asset($user->identity_card_url) }}" alt="Identity Document" class="img-fluid rounded mb-2" style="max-height: 260px; object-fit: contain;">
+                                <div>
+                                    <a href="{{ asset($user->identity_card_url) }}" target="_blank">Open full image</a>
+                                </div>
+                            @else
+                                <p class="text-muted mb-0">No identity document uploaded.</p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Editable Profile Form -->

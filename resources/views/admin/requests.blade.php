@@ -53,13 +53,13 @@
                     <div class="row g-3 align-items-start">
                         <div class="col-md-4 col-lg-3">
                             <div class="verify-image text-center">
-                                @if(!empty($user->identity_image_url))
-                                    <img src="{{ asset($user->identity_image_url) }}" alt="Identity" class="img-fluid verify-image__img">
-                                    <div class="small mt-2">
-                                        <a href="{{ asset($user->identity_image_url) }}" target="_blank">Open full image</a>
+                                @if(!empty($user->identity_card_url))
+                                    <img src="{{ asset($user->identity_card_url) }}" alt="Identity" class="img-fluid verify-image__img">
+                                    <div class="mt-2">
+                                        <a href="{{ asset($user->identity_card_url) }}" target="_blank">Open full image</a>
                                     </div>
                                 @else
-                                    <div class="text-muted py-5">No identity image</div>
+                                    <div class="text-muted py-5">No document uploaded</div>
                                 @endif
                             </div>
                         </div>
