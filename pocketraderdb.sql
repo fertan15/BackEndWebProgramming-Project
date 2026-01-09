@@ -21,18 +21,18 @@ USE `pocketraderdb`;
 DROP TABLE IF EXISTS `card_sets`;
 
 CREATE TABLE `card_sets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `release_date` date DEFAULT NULL,
-  `description` text DEFAULT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
-  `total_cards` int(11) DEFAULT 0,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `release_date` DATE DEFAULT NULL,
+  `description` TEXT DEFAULT NULL,
+  `image_url` VARCHAR(255) DEFAULT NULL,
+  `total_cards` INT(11) DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `card_sets` */
 
-insert  into `card_sets`(`id`,`name`,`release_date`,`description`,`image_url`,`total_cards`) values 
+INSERT  INTO `card_sets`(`id`,`name`,`release_date`,`description`,`image_url`,`total_cards`) VALUES 
 (1,'Genetic Apex','2024-10-30','The first main expansion heavily focused on Generation 1 Pokémon (Kanto).','images/PokemonCards/A1_Genetic_Apex/A1.webp',286),
 (2,'Mythical Island','2024-12-17','A mini-expansion focusing on Mythical Pokémon.','images/PokemonCards/A1a_Mythical_Island/A1a.webp',86),
 (3,'Mega Rising','2025-10-30','The debut of the B-Series, introducing Mega Evolution.','images/PokemonCards/B1_Mega_Rising/B1.webp',331),
@@ -43,23 +43,23 @@ insert  into `card_sets`(`id`,`name`,`release_date`,`description`,`image_url`,`t
 DROP TABLE IF EXISTS `cards`;
 
 CREATE TABLE `cards` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `card_set_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `card_type` varchar(50) DEFAULT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
-  `rarity` varchar(50) DEFAULT NULL,
-  `edition` varchar(50) DEFAULT NULL,
-  `estimated_market_price` decimal(10,2) DEFAULT 0.00,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `card_set_id` INT(11) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `card_type` VARCHAR(50) DEFAULT NULL,
+  `image_url` VARCHAR(255) DEFAULT NULL,
+  `rarity` VARCHAR(50) DEFAULT NULL,
+  `edition` VARCHAR(50) DEFAULT NULL,
+  `estimated_market_price` DECIMAL(10,2) DEFAULT 0.00,
   PRIMARY KEY (`id`),
   KEY `idx_cards_name` (`name`),
   KEY `idx_cards_set` (`card_set_id`),
   CONSTRAINT `cards_ibfk_1` FOREIGN KEY (`card_set_id`) REFERENCES `card_sets` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `cards` */
 
-insert  into `cards`(`id`,`card_set_id`,`name`,`card_type`,`image_url`,`rarity`,`edition`,`estimated_market_price`) values 
+INSERT  INTO `cards`(`id`,`card_set_id`,`name`,`card_type`,`image_url`,`rarity`,`edition`,`estimated_market_price`) VALUES 
 (1,1,'Bulbasaur','Grass','images/PokemonCards/A1_Genetic_Apex/A1_001_EN_SM.webp','1-Diamond','Normal',0.10),
 (2,1,'Ivysaur','Grass','images/PokemonCards/A1_Genetic_Apex/A1_002_EN_SM.webp','2-Diamond','Normal',0.25),
 (3,1,'Venusaur EX','Grass','images/PokemonCards/A1_Genetic_Apex/A1_003_EN_SM.webp','4-Diamond','EX',15.00),
@@ -131,20 +131,20 @@ insert  into `cards`(`id`,`card_set_id`,`name`,`card_type`,`image_url`,`rarity`,
 DROP TABLE IF EXISTS `chats`;
 
 CREATE TABLE `chats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user1_id` int(11) NOT NULL,
-  `user2_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user1_id` INT(11) NOT NULL,
+  `user2_id` INT(11) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   KEY `user2_id` (`user2_id`),
   KEY `idx_chats_users` (`user1_id`,`user2_id`),
   CONSTRAINT `chats_ibfk_1` FOREIGN KEY (`user1_id`) REFERENCES `users` (`id`),
   CONSTRAINT `chats_ibfk_2` FOREIGN KEY (`user2_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `chats` */
 
-insert  into `chats`(`id`,`user1_id`,`user2_id`,`created_at`) values 
+INSERT  INTO `chats`(`id`,`user1_id`,`user2_id`,`created_at`) VALUES 
 (1,1,2,'2025-12-12 09:00:00'),
 (2,2,3,'2025-12-12 09:30:00'),
 (3,1,3,'2026-01-07 08:39:26'),
@@ -156,26 +156,26 @@ insert  into `chats`(`id`,`user1_id`,`user2_id`,`created_at`) values
 DROP TABLE IF EXISTS `listings`;
 
 CREATE TABLE `listings` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `card_id` int(11) NOT NULL,
-  `seller_id` int(11) NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `condition_text` enum('Mint','Near Mint','Lightly Played','Heavily Played','Damaged') NOT NULL,
-  `description` text DEFAULT NULL,
-  `quantity` int(11) DEFAULT 1,
-  `is_active` tinyint(1) DEFAULT 1,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `user_collection_id` int(11) DEFAULT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `card_id` INT(11) NOT NULL,
+  `seller_id` INT(11) NOT NULL,
+  `price` DECIMAL(10,2) NOT NULL,
+  `condition_text` ENUM('Mint','Near Mint','Lightly Played','Heavily Played','Damaged') NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  `quantity` INT(11) DEFAULT 1,
+  `is_active` TINYINT(1) DEFAULT 1,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `user_collection_id` INT(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `seller_id` (`seller_id`),
   KEY `idx_listings_filter` (`card_id`,`is_active`,`price`),
   CONSTRAINT `listings_ibfk_1` FOREIGN KEY (`card_id`) REFERENCES `cards` (`id`),
   CONSTRAINT `listings_ibfk_2` FOREIGN KEY (`seller_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `listings` */
 
-insert  into `listings`(`id`,`card_id`,`seller_id`,`price`,`condition_text`,`description`,`quantity`,`is_active`,`created_at`,`user_collection_id`) values 
+INSERT  INTO `listings`(`id`,`card_id`,`seller_id`,`price`,`condition_text`,`description`,`quantity`,`is_active`,`created_at`,`user_collection_id`) VALUES 
 (1,4,2,30.00,'Near Mint','Pikachu NM',0,0,'2026-01-09 02:04:35',NULL),
 (2,5,2,45.00,'Lightly Played','Eevee LP',1,1,'2026-01-09 02:04:35',NULL),
 (3,2,3,210.00,'Mint','Blastoise Mint',1,1,'2026-01-09 02:04:35',NULL),
@@ -201,22 +201,22 @@ insert  into `listings`(`id`,`card_id`,`seller_id`,`price`,`condition_text`,`des
 DROP TABLE IF EXISTS `messages`;
 
 CREATE TABLE `messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `chat_id` int(11) NOT NULL,
-  `sender_id` int(11) NOT NULL,
-  `content` text NOT NULL,
-  `sent_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `read` tinyint(1) NOT NULL DEFAULT 0,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `chat_id` INT(11) NOT NULL,
+  `sender_id` INT(11) NOT NULL,
+  `content` TEXT NOT NULL,
+  `sent_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `read` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `sender_id` (`sender_id`),
   KEY `idx_messages_chat` (`chat_id`,`sent_at`),
   CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON DELETE CASCADE,
   CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `messages` */
 
-insert  into `messages`(`id`,`chat_id`,`sender_id`,`content`,`sent_at`,`read`) values 
+INSERT  INTO `messages`(`id`,`chat_id`,`sender_id`,`content`,`sent_at`,`read`) VALUES 
 (1,1,1,'Hi Alice, interested in Pikachu.','2025-12-12 09:05:00',0),
 (2,1,2,'Sure, I have two near mint.','2025-12-12 09:06:00',1),
 (5,3,1,'oi nigha','2026-01-07 08:39:26',1);
@@ -226,24 +226,24 @@ insert  into `messages`(`id`,`chat_id`,`sender_id`,`content`,`sent_at`,`read`) v
 DROP TABLE IF EXISTS `notifications`;
 
 CREATE TABLE `notifications` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) unsigned DEFAULT NULL,
-  `type` varchar(255) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `action_url` varchar(255) DEFAULT NULL,
-  `is_read` tinyint(1) NOT NULL DEFAULT 0,
-  `read_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT(20) UNSIGNED DEFAULT NULL,
+  `type` VARCHAR(255) NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `message` TEXT NOT NULL,
+  `action_url` VARCHAR(255) DEFAULT NULL,
+  `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+  `read_at` TIMESTAMP NULL DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `notifications_user_id_index` (`user_id`),
   KEY `notifications_is_read_index` (`is_read`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=INNODB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `notifications` */
 
-insert  into `notifications`(`id`,`user_id`,`type`,`title`,`message`,`action_url`,`is_read`,`read_at`,`created_at`,`updated_at`) values 
+INSERT  INTO `notifications`(`id`,`user_id`,`type`,`title`,`message`,`action_url`,`is_read`,`read_at`,`created_at`,`updated_at`) VALUES 
 (1,1,'order','Order Placed Successfully','Your item #12345 has been purchased.','/items/12345',1,'2026-01-07 08:49:18','2026-01-07 15:36:31','2026-01-07 08:49:18');
 
 /*Table structure for table `order_items` */
@@ -251,22 +251,22 @@ insert  into `notifications`(`id`,`user_id`,`type`,`title`,`message`,`action_url
 DROP TABLE IF EXISTS `order_items`;
 
 CREATE TABLE `order_items` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `listing_id` int(11) NOT NULL,
-  `buyer_id` int(11) NOT NULL,
-  `quantity` int(11) DEFAULT 1,
-  `price_at_purchase` decimal(10,2) NOT NULL,
-  `purchased_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `listing_id` INT(11) NOT NULL,
+  `buyer_id` INT(11) NOT NULL,
+  `quantity` INT(11) DEFAULT 1,
+  `price_at_purchase` DECIMAL(10,2) NOT NULL,
+  `purchased_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   KEY `listing_id` (`listing_id`),
   KEY `buyer_id` (`buyer_id`),
   CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`id`),
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `order_items` */
 
-insert  into `order_items`(`id`,`listing_id`,`buyer_id`,`quantity`,`price_at_purchase`,`purchased_at`) values 
+INSERT  INTO `order_items`(`id`,`listing_id`,`buyer_id`,`quantity`,`price_at_purchase`,`purchased_at`) VALUES 
 (1,1,1,1,30.00,'2026-01-09 01:14:38'),
 (2,2,1,1,45.00,'2026-01-09 01:14:38'),
 (3,3,1,1,210.00,'2026-01-09 01:14:38'),
@@ -292,13 +292,13 @@ insert  into `order_items`(`id`,`listing_id`,`buyer_id`,`quantity`,`price_at_pur
 DROP TABLE IF EXISTS `reviews`;
 
 CREATE TABLE `reviews` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `reviewer_id` int(11) NOT NULL,
-  `reviewee_id` int(11) NOT NULL,
-  `order_item_id` int(11) NOT NULL,
-  `rating` tinyint(3) unsigned NOT NULL CHECK (`rating` between 1 and 5),
-  `comment` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `reviewer_id` INT(11) NOT NULL,
+  `reviewee_id` INT(11) NOT NULL,
+  `order_item_id` INT(11) NOT NULL,
+  `rating` TINYINT(3) UNSIGNED NOT NULL CHECK (`rating` BETWEEN 1 AND 5),
+  `comment` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   KEY `reviewer_id` (`reviewer_id`),
   KEY `reviewee_id` (`reviewee_id`),
@@ -306,11 +306,11 @@ CREATE TABLE `reviews` (
   CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`id`),
   CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`reviewee_id`) REFERENCES `users` (`id`),
   CONSTRAINT `reviews_ibfk_3` FOREIGN KEY (`order_item_id`) REFERENCES `order_items` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `reviews` */
 
-insert  into `reviews`(`id`,`reviewer_id`,`reviewee_id`,`order_item_id`,`rating`,`comment`,`created_at`) values 
+INSERT  INTO `reviews`(`id`,`reviewer_id`,`reviewee_id`,`order_item_id`,`rating`,`comment`,`created_at`) VALUES 
 (1,4,2,1,5,'Great seller, fast shipping!','2025-12-16 09:00:00'),
 (2,5,2,2,4,'Item as described.','2025-12-17 10:00:00');
 
@@ -319,23 +319,23 @@ insert  into `reviews`(`id`,`reviewer_id`,`reviewee_id`,`order_item_id`,`rating`
 DROP TABLE IF EXISTS `user_collections`;
 
 CREATE TABLE `user_collections` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `card_id` int(11) NOT NULL,
-  `condition_text` enum('Mint','Near Mint','Lightly Played','Heavily Played','Damaged') DEFAULT NULL,
-  `is_for_trade` tinyint(1) DEFAULT 0,
-  `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `is_listed` tinyint(1) NOT NULL DEFAULT 0,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `card_id` INT(11) NOT NULL,
+  `condition_text` ENUM('Mint','Near Mint','Lightly Played','Heavily Played','Damaged') DEFAULT NULL,
+  `is_for_trade` TINYINT(1) DEFAULT 0,
+  `added_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `is_listed` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `card_id` (`card_id`),
   CONSTRAINT `user_collections_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `user_collections_ibfk_2` FOREIGN KEY (`card_id`) REFERENCES `cards` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `user_collections` */
 
-insert  into `user_collections`(`id`,`user_id`,`card_id`,`condition_text`,`is_for_trade`,`added_at`,`is_listed`) values 
+INSERT  INTO `user_collections`(`id`,`user_id`,`card_id`,`condition_text`,`is_for_trade`,`added_at`,`is_listed`) VALUES 
 (1,1,1,'Lightly Played',0,'2025-12-10 08:00:00',0),
 (2,2,2,'Mint',1,'2025-12-10 08:30:00',0),
 (26,3,1,'Lightly Played',0,'2026-01-08 19:07:20',0),
@@ -348,42 +348,44 @@ insert  into `user_collections`(`id`,`user_id`,`card_id`,`condition_text`,`is_fo
 (33,1,17,'Mint',0,'2026-01-08 19:50:11',0),
 (34,1,17,'Mint',0,'2026-01-08 19:52:48',0),
 (35,1,1,'Lightly Played',0,'2026-01-08 19:55:17',0),
-(36,1,1,'Lightly Played',0,'2026-01-08 20:00:17',0);
+(36,1,1,'Lightly Played',0,'2026-01-08 20:00:17',0),
+(37,3,53,'Lightly Played',0,'2026-01-08 21:00:17',0);
+
 
 /*Table structure for table `users` */
 
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `phone_number` varchar(20) DEFAULT NULL,
-  `balance` decimal(10,2) DEFAULT 0.00,
-  `identity_type` enum('KTP','SIM','Passport') DEFAULT NULL,
-  `identity_number` varchar(50) DEFAULT NULL,
-  `identity_image_url` varchar(255) DEFAULT NULL,
-  `identity_card_url` varchar(255) DEFAULT NULL,
-  `identity_status` enum('unverified','pending','verified','rejected') DEFAULT 'unverified',
-  `otp_code` varchar(10) DEFAULT NULL,
-  `otp_expires_at` timestamp NULL DEFAULT NULL,
-  `account_status` enum('active','suspended','banned','verify') DEFAULT 'verify',
-  `ban_reason` varchar(255) DEFAULT NULL,
-  `banned_at` timestamp NULL DEFAULT NULL,
-  `is_admin` tinyint(1) DEFAULT 0,
-  `last_online` timestamp NOT NULL DEFAULT current_timestamp(),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `username` VARCHAR(50) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `phone_number` VARCHAR(20) DEFAULT NULL,
+  `balance` DECIMAL(10,2) DEFAULT 0.00,
+  `identity_type` ENUM('KTP','SIM','Passport') DEFAULT NULL,
+  `identity_number` VARCHAR(50) DEFAULT NULL,
+  `identity_image_url` VARCHAR(255) DEFAULT NULL,
+  `identity_card_url` VARCHAR(255) DEFAULT NULL,
+  `identity_status` ENUM('unverified','pending','verified','rejected') DEFAULT 'unverified',
+  `otp_code` VARCHAR(10) DEFAULT NULL,
+  `otp_expires_at` TIMESTAMP NULL DEFAULT NULL,
+  `account_status` ENUM('active','suspended','banned','verify') DEFAULT 'verify',
+  `ban_reason` VARCHAR(255) DEFAULT NULL,
+  `banned_at` TIMESTAMP NULL DEFAULT NULL,
+  `is_admin` TINYINT(1) DEFAULT 0,
+  `last_online` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_users_username` (`username`),
   UNIQUE KEY `idx_users_email` (`email`),
   UNIQUE KEY `idx_users_identity` (`identity_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`name`,`username`,`password_hash`,`email`,`phone_number`,`balance`,`identity_type`,`identity_number`,`identity_image_url`,`identity_card_url`,`identity_status`,`otp_code`,`otp_expires_at`,`account_status`,`ban_reason`,`banned_at`,`is_admin`,`last_online`,`created_at`) values 
+INSERT  INTO `users`(`id`,`name`,`username`,`password_hash`,`email`,`phone_number`,`balance`,`identity_type`,`identity_number`,`identity_image_url`,`identity_card_url`,`identity_status`,`otp_code`,`otp_expires_at`,`account_status`,`ban_reason`,`banned_at`,`is_admin`,`last_online`,`created_at`) VALUES 
 (1,'Benny Example','benny','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','benny@example.com',NULL,9895.98,NULL,NULL,NULL,NULL,'verified',NULL,NULL,'active',NULL,NULL,1,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
 (2,'Alice Seller','alice','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','alice@example.com',NULL,50.00,NULL,NULL,NULL,NULL,'verified',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
 (3,'Bob Seller','bob','$2y$10$kwFPqfciiYDn7gFiqiSHz.wXMyECv4u67Zd2Ycs5n.zysmv5Cgt1C','bob@example.com',NULL,13.97,NULL,NULL,NULL,NULL,'rejected',NULL,NULL,'active',NULL,NULL,0,'2026-01-09 02:04:34','2026-01-09 02:04:34'),
@@ -395,21 +397,21 @@ insert  into `users`(`id`,`name`,`username`,`password_hash`,`email`,`phone_numbe
 DROP TABLE IF EXISTS `wallet_transactions`;
 
 CREATE TABLE `wallet_transactions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `reference_order_item_id` int(11) DEFAULT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `transaction_type` enum('TOPUP','PURCHASE','SALES_REVENUE','WITHDRAWAL','REFUND') NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `reference_order_item_id` INT(11) DEFAULT NULL,
+  `amount` DECIMAL(10,2) NOT NULL,
+  `transaction_type` ENUM('TOPUP','PURCHASE','SALES_REVENUE','WITHDRAWAL','REFUND') NOT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   KEY `idx_wallet_user` (`user_id`,`created_at`),
   CONSTRAINT `wallet_transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `wallet_transactions` */
 
-insert  into `wallet_transactions`(`id`,`user_id`,`reference_order_item_id`,`amount`,`transaction_type`,`description`,`created_at`) values 
+INSERT  INTO `wallet_transactions`(`id`,`user_id`,`reference_order_item_id`,`amount`,`transaction_type`,`description`,`created_at`) VALUES 
 (1,4,NULL,100.00,'TOPUP','Initial topup','2025-12-12 08:00:00'),
 (2,4,1,-39.50,'PURCHASE','Item #1 payment','2025-12-13 10:05:00'),
 (3,2,1,30.00,'SALES_REVENUE','Item #1 revenue','2025-12-13 10:06:00'),
@@ -438,20 +440,20 @@ insert  into `wallet_transactions`(`id`,`user_id`,`reference_order_item_id`,`amo
 DROP TABLE IF EXISTS `wishlists`;
 
 CREATE TABLE `wishlists` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `card_id` int(11) NOT NULL,
-  `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `card_id` INT(11) NOT NULL,
+  `added_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_wishlist` (`user_id`,`card_id`),
   KEY `card_id` (`card_id`),
   CONSTRAINT `wishlists_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `wishlists_ibfk_2` FOREIGN KEY (`card_id`) REFERENCES `cards` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=INNODB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `wishlists` */
 
-insert  into `wishlists`(`id`,`user_id`,`card_id`,`added_at`) values 
+INSERT  INTO `wishlists`(`id`,`user_id`,`card_id`,`added_at`) VALUES 
 (2,5,1,'2025-12-12 07:30:00');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
