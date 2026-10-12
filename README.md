@@ -1,59 +1,131 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PocketRader - Pokemon Card Trading Platform & Marketplace
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/images/side_logo" alt="PocketRader Logo" width="220" />
 </p>
 
-## About Laravel
+<p align="center">
+  A full-featured web-based Pokemon Trading Card Game (TCG) marketplace and collector platform built with <strong>Laravel 12</strong>, <strong>MySQL</strong>, and <strong>Midtrans Snap</strong> payment gateway.
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📖 Complete Documentation
+For exhaustive technical specifications, Entity Relationship Diagrams (ERD), controller workflows, database schemas, and route indexes, please refer to:
+👉 **[PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md)**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Key Highlights & Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Multi-Step KYC & OTP Registration:**
+  - 3-step registration flow: Personal details $\rightarrow$ 6-digit email OTP verification $\rightarrow$ Government ID upload (KTP / SIM / Passport).
+  - Strict middleware guards (`verified.transaction`) ensuring only KYC-verified users can buy or sell cards.
+- **Steam Market-Style Trading:**
+  - Card sets and expansions browser (`Genetic Apex`, `Mythical Island`, `Mega Rising`, `Crimson Blaze`).
+  - Card detail pages featuring 30-day dynamic price charts, active market listings, condition badges, and sales history.
+  - Multi-item and single-item P2P listing purchases with atomic database transactions (`DB::transaction`).
+- **Inventory Binder & Lock/Unlock:**
+  - Separate views for tradeable and locked cards to prevent accidental listings.
+  - One-click listing creation directly from inventory.
+- **In-Platform Wallet & Midtrans Payment Gateway:**
+  - Midtrans Snap integration for wallet top-ups via GoPay, Virtual Accounts, QRIS, and Credit Cards.
+  - Secure webhook endpoint with SHA-512 signature validation and automatic IDR-to-USD currency conversion.
+- **P2P Live Messaging & Notifications:**
+  - Direct buyer-seller chat system with real-time polling, avatars, and unread counts.
+  - Comprehensive notification center for orders, sales revenues, wishlist changes, and system announcements.
+- **Admin Management Portal (`/admin`):**
+  - Identity verification request review (approve or reject with automatic file clean-up).
+  - User moderation with account suspension and ban toggles.
+  - Expansion set management and card catalog creation with automatic card count recalculations.
+- **Analytics & Platform Insights (`/home`):**
+  - Leaderboards for Top Seller, Top Buyer, Most Traded Card, and platform GMV.
+  - Individual user sales and purchase statistics.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🛠️ Tech Stack
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Backend:** Laravel 12 (PHP 8.2+)
+- **Database:** MySQL / MariaDB (`pocketraderdb`)
+- **Frontend:** Blade Templating, jQuery, Bootstrap Grid, LineIcons (`lni`), Chart.js
+- **Payment Gateway:** Midtrans Snap API (Sandbox)
+- **Mailing:** Laravel Mailable (`OtpEmail`)
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ⚡ Quick Start
 
-## Contributing
+### 1. Requirements
+- PHP 8.2+
+- Composer 2.x
+- MySQL / MariaDB
+- Node.js 18+ & NPM
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Setup Instructions
 
-## Code of Conduct
+```bash
+# Clone the repository
+git clone https://github.com/fertan15/BackEndWebProgramming-Project.git
+cd BackEndWebProgramming-Project
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Install backend dependencies
+composer install
 
-## Security Vulnerabilities
+# Install frontend dependencies
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Copy environment file and generate application key
+cp .env.example .env
+php artisan key:generate
+```
 
-## License
+### 3. Database Setup
+Create a database named `pocketraderdb` and import the provided SQL dump:
+```bash
+mysql -u root -p pocketraderdb < pocketraderdb.sql
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Update your `.env` database settings:
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=pocketraderdb
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Run Development Servers
+```bash
+# Concurrently launch server, queue, logs, and Vite:
+composer run dev
+
+# Or run standard Laravel serve:
+php artisan serve
+```
+
+Visit the application at: `http://localhost:8000`
+
+---
+
+## 📂 Project Structure Overview
+
+```
+├── app/
+│   ├── Http/Controllers/    # Application controllers (Auth, Cards, Checkout, Chat, Admin, etc.)
+│   ├── Http/Middleware/     # Auth & KYC transaction verification guards
+│   ├── Mail/                # Mailable classes (OtpEmail)
+│   └── Models/              # Eloquent models (Users, Cards, Listings, OrderItems, etc.)
+├── pocketraderdb.sql        # Database schema and seed data
+├── PROJECT_DOCUMENTATION.md # Comprehensive technical documentation & ERD
+├── public/                  # Static assets & file uploads (register KYC documents)
+├── resources/views/         # Blade views (Admin, Auth, Cards, Chat, Checkout, etc.)
+└── routes/web.php           # Application web routes and API endpoints
+```
+
+---
+
+## 📄 License
+This project was developed for the **BackEnd Web Programming (BWP)** Course, Semester 3.
+All Pokemon trademarks and card images are copyright of Nintendo, Creatures Inc., and GAME FREAK Inc.
