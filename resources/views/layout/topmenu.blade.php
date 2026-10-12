@@ -88,8 +88,8 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('orders') }}"> 
-                                    <i class="lni lni-archive"></i> My Orders 
+                                <a href="{{ route('history') }}"> 
+                                    <i class="lni lni-archive"></i> Order History 
                                 </a>
                             </li>
                             <li>

@@ -112,16 +112,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
             
-            // Handle redirect to login
-            if (response.status === 401 && data.redirect) {
-                window.location.href = data.redirect + '?message=' + encodeURIComponent(data.message);
-                return;
-            }
-            
-                showMessage('success', data.message);
+                // Handle redirect to login
+                if (response.status === 401 && data.redirect) {
+                    window.location.href = data.redirect + '?message=' + encodeURIComponent(data.message);
+                    return;
+                }
+
+                if (data.status === 'success') {
+                    // Update button state
+                    const inWishlist = data.in_wishlist;
+                    button.dataset.inWishlist = inWishlist ? '1' : '0';
+                    
+                    // Update button style and content
+                    if (inWishlist) {
+                        button.classList.remove('btn-outline-danger');
+                        button.classList.add('btn-danger');
+                        button.innerHTML = `<span class="wishlist-icon">${iconFill}</span>`;
+                        button.title = 'Remove from Wishlist';
+                    } else {
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-outline-danger');
+                        button.innerHTML = `<span class="wishlist-icon">${iconOutline}</span>`;
+                        button.title = 'Add to Wishlist';
+                    }
+                    
+                    showMessage('success', data.message);
+                } else {
+                    button.innerHTML = previousContent;
+                    showMessage('danger', data.message || 'Something went wrong');
+                }
             } catch (error) {
                 button.innerHTML = previousContent;
-                showMessage('danger', error.message);
+                showMessage('danger', 'Failed to update wishlist. Please try again.');
             } finally {
                 button.disabled = false;
             }

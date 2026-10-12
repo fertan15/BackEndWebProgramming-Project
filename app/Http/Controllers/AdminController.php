@@ -154,6 +154,12 @@ class AdminController extends Controller
     public function banUser($id)
     {
         $user = Users::findOrFail($id);
+        
+        // Prevent admin from banning themselves
+        $currentUserId = session('user_id');
+        if ($user->id == $currentUserId) {
+            return redirect()->route('admin.users')->with('error', 'You cannot ban yourself.');
+        }
 
         if ($user->account_status === 'banned') {
             // Unban the user
@@ -240,5 +246,36 @@ class AdminController extends Controller
         CardSets::where('id', $setId)->update(['total_cards' => $actualCount]);
 
         return redirect()->back()->with('success', 'Card deleted successfully.');
+    }
+
+    public function deleteCardSet($id)
+    {
+        $cardSet = CardSets::findOrFail($id);
+
+        // Delete all cards in this set first
+        $cards = Cards::where('card_set_id', $id)->get();
+        foreach ($cards as $card) {
+            // Delete card image file if it exists
+            if ($card->image_url) {
+                $imagePath = public_path($card->image_url);
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+            $card->delete();
+        }
+
+        // Delete the card set image file if it exists
+        if ($cardSet->image_url) {
+            $imagePath = public_path($cardSet->image_url);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
+        // Delete the card set
+        $cardSet->delete();
+
+        return redirect()->route('admin.card_sets.create')->with('success', 'Card set and all its cards deleted successfully.');
     }
 }

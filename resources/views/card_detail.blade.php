@@ -3,6 +3,27 @@
 @section('main_contents')
     <section class="section">
         <div class="container-fluid">
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>⚠️ Warning:</strong> {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>❌ Error:</strong> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>✅ Success:</strong> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <!-- Breadcrumb -->
             <div class="title-wrapper pt-30 mb-4">
                 <nav aria-label="breadcrumb">
@@ -97,11 +118,23 @@
                 <!-- Right Column: Price Chart, Listings, etc. -->
                 <div class="col-lg-7 col-xl-8">
                     <!-- Price History Chart -->
-                    <div class="card mb-4">
-                        <div class="card-header">
+                     <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Price History (Last 30 Days)</h5>
+                            @if(isset($priceHistory['hasRealData']))
+                                @if($priceHistory['hasRealData'])
+                                    <span class="badge bg-success">Real Data</span>
+                                @else
+                                    <span class="badge bg-secondary">Estimated Price</span>
+                                @endif
+                            @endif
                         </div>
                         <div class="card-body">
+                            @if(isset($priceHistory['hasRealData']) && !$priceHistory['hasRealData'])
+                                <div class="alert alert-info mb-3">
+                                    <small><i class="lni lni-information"></i> No transaction history available yet. Showing estimated market price.</small>
+                                </div>
+                            @endif
                             <canvas id="priceChart" height="100"></canvas>
                         </div>
                     </div>
@@ -320,8 +353,10 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // price history chartnya
+    // ini price chart real timenya
         const ctx = document.getElementById('priceChart').getContext('2d');
+        const hasRealData = {{ $priceHistory['hasRealData'] ? 'true' : 'false' }};
+        
         const priceChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -329,12 +364,13 @@
                 datasets: [{
                     label: 'Price ($)',
                     data: @json($priceHistory['prices']),
-                    borderColor: 'rgb(54, 162, 235)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderColor: hasRealData ? 'rgb(54, 162, 235)' : 'rgb(156, 163, 175)',
+                    backgroundColor: hasRealData ? 'rgba(54, 162, 235, 0.1)' : 'rgba(156, 163, 175, 0.1)',
                     tension: 0.4,
                     fill: true,
-                    pointRadius: 3,
-                    pointHoverRadius: 6
+                    pointRadius: hasRealData ? 3 : 0,
+                    pointHoverRadius: hasRealData ? 6 : 3,
+                    borderDash: hasRealData ? [] : [5, 5]
                 }]
             },
             options: {
